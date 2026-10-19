@@ -1,3 +1,5 @@
+package edu.hanover.sdp2026;
+
 public enum Color {
     WHITE,
     BLACK;
