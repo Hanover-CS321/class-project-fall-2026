@@ -24,7 +24,7 @@ java {
 }
 
 application {
-    mainClass = "edu.hanover.sdp2026.App"
+    mainClass = "edu.hanover.sdp2026.Main"
 }
 
 tasks.test {
