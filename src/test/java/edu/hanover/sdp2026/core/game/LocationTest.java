@@ -1,4 +1,4 @@
-package edu.hanover.sdp2026;
+package edu.hanover.sdp2026.core.game;
 
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +8,7 @@ class LocationTest {
 
     @Test
     void fromCoordinatesAssertsPropperRowAndColValues() {
-        assertEquals(1,Location.fromCoordinates(1,1).col());
+        assertEquals(1, Location.fromCoordinates(1,1).col());
         assertEquals(1,Location.fromCoordinates(1,1).row());
     }
 

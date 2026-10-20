@@ -1,4 +1,4 @@
-package edu.hanover.sdp2026;
+package edu.hanover.sdp2026.core.game;
 
 import org.junit.jupiter.api.Test;
 

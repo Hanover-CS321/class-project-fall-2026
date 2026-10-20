@@ -1,8 +1,7 @@
-package edu.hanover.sdp2026.core;
+package edu.hanover.sdp2026.core.game;
 
+import edu.hanover.sdp2026.core.GameManager;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class GameManagerTest {
     @Test
