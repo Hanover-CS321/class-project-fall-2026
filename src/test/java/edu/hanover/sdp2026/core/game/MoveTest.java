@@ -10,15 +10,19 @@ class MoveTest {
         Piece p = new Piece(PieceType.Rook, Color.WHITE);
         Location loc1 = Location.fromCoordinates(2, 2);
         Location loc2 = Location.fromCoordinates( 2, 4);
-        Move m = new Move(p, loc1, loc2);
-        assertTrue(assertHasSame(m, new Move(p, loc1, loc2)));
+        Move move = new Move(p, loc1, loc2);
+        assertEquals(loc1, move.getFrom());
+        assertEquals(loc2, move.getTo());
+        assertEquals(p, move.getPiece());
     }
 
-    private boolean assertHasSame(Move m, Move move) {
-        if (m.getTo() == move. getTo() && m.getFrom() == move.getFrom()) {
-            return true;
-        }
-        return false;
+    @Test
+    void testMoveAsString() {
+        Piece p = new Piece(PieceType.Rook, Color.WHITE);
+        Location loc1 = Location.fromCoordinates(2, 2);
+        Location loc2 = Location.fromCoordinates( 2, 4);
+        Move move =  new Move(p, loc1, loc2);
+        assertEquals("Rb4", move.moveAsString());
     }
-
+    
 }
