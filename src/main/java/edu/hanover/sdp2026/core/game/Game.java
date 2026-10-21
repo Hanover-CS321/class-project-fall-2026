@@ -2,15 +2,19 @@ package edu.hanover.sdp2026.core.game;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Game {
-    HashMap<Location, Piece> board;
-    Color turn;
-    public Game() {
-        setupInitialBoard();
-        turn = Color.WHITE;
-    }
+    private Map<Location, Piece> board = new HashMap<>();
+    private Color turn = Color.WHITE;
 
+    public Game() {}
+
+    public static Game createDefaultGame() {
+        Game game = new Game();
+        game.setupInitialBoard();
+        return  game;
+    }
 
     public ArrayList<Move> computeMoves(Location location){
         return new ArrayList<Move>();
