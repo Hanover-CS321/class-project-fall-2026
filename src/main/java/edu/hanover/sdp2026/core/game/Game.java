@@ -13,7 +13,54 @@ public class Game {
 
 
     public ArrayList<Move> computeMoves(Location location){
-        return new ArrayList<Move>();
+        Piece piece = getPiece(location);
+        
+        if(piece == null) return null;
+
+        if(isColorTurnOf(piece)) return null;
+
+        return switch(piece.getType()) {
+            case Pawn -> computePawnMoves(location, piece);
+            case Rook -> computeRookMoves(location, piece);
+            case Knight -> computeKnightMoves(location, piece);
+            case Bishop -> computeBishopMoves(location, piece);
+            case Queen -> computeQueenMoves(location, piece);
+            case King -> computeKingMoves(location, piece);
+            default -> throw new RuntimeException("no valid PieceType");
+        };
+
+    }
+
+    private boolean isColorTurnOf(Piece piece) {
+        return piece.getColor() == turn;
+    }
+
+    private Piece getPiece(Location location) {
+        return board.getOrDefault(location, null);
+    }
+
+    public ArrayList<Move> computePawnMoves(Location location, Piece piece){
+        throw new RuntimeException("not implemented yet");
+    }
+
+    public ArrayList<Move> computeRookMoves(Location location, Piece piece){
+        throw new RuntimeException("not implemented yet");
+    }
+
+    public ArrayList<Move> computeKnightMoves(Location location, Piece piece){
+        throw new RuntimeException("not implemented yet");
+    }
+
+    public ArrayList<Move> computeBishopMoves(Location location, Piece piece){
+        throw new RuntimeException("not implemented yet");
+    }
+
+    public ArrayList<Move> computeQueenMoves(Location location, Piece piece){
+        throw new RuntimeException("not implemented yet");
+    }
+
+    public ArrayList<Move> computeKingMoves(Location location, Piece piece){
+        throw new RuntimeException("not implemented yet");
     }
 
     public void makeMove(Move move){}
