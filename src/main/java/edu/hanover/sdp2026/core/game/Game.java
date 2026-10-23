@@ -39,7 +39,7 @@ public class Game {
         return piece.getColor() == turn;
     }
 
-    private Piece getPiece(Location location) {
+    Piece getPiece(Location location) {
         return board.getOrDefault(location, null);
     }
 
