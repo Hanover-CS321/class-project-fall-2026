@@ -21,7 +21,7 @@ public class Game {
         
         if(piece == null) return null;
 
-        if(isColorTurnOf(piece)) return null;
+        if(!isColorTurnOf(piece)) return null;
 
         return switch(piece.getType()) {
             case Pawn -> computePawnMoves(location, piece);
