@@ -14,6 +14,15 @@ public class GameManager implements Interactor {
         this.presenter = presenter;
     }
 
+    public void start() {
+        if (presenter == null) {
+            throw new IllegalStateException(
+                    "A presenter must be set before starting."
+            );
+        }
+        presenter.start();
+    }
+
     @Override
     public void handleAction(UserAction action) {
         if (action instanceof ChooseSquareAction) {
@@ -61,10 +70,5 @@ public class GameManager implements Interactor {
         throw new UnsupportedOperationException(
                 "Resign processing not yet implemented."
         );
-    }
-
-    @Override
-    public void start() {
-
     }
 }
