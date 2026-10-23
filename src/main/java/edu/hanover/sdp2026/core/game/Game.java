@@ -43,6 +43,11 @@ public class Game {
         return board.getOrDefault(location, null);
     }
 
+    void putPiece(Location location, PieceType type, Color color){
+        if(getPiece(location) != null) throw new RuntimeException("space is occupied");
+        board.put(location, new Piece(type, color));
+    }
+    
     public ArrayList<Move> computePawnMoves(Location location, Piece piece){
         throw new RuntimeException("not implemented yet");
     }
