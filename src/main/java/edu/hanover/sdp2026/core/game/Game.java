@@ -35,17 +35,17 @@ public class Game {
         };
 
 
-        for (int col = 0; col < 8; col++) {
-            board.put(Location.fromCoordinates(col,0),
+        for (int col = 1; col <= 8; col++) {
+            board.put(Location.fromCoordinates(col,1),
                     new Piece(backRow[col],Color.WHITE));
 
-            board.put(Location.fromCoordinates(col,1),
+            board.put(Location.fromCoordinates(col,2),
                     new Piece(PieceType.Pawn,Color.WHITE));
 
-            board.put(Location.fromCoordinates(col,6),
+            board.put(Location.fromCoordinates(col,7),
                     new Piece(PieceType.Pawn,Color.BLACK));
 
-            board.put(Location.fromCoordinates(col,7),
+            board.put(Location.fromCoordinates(col,8),
                     new Piece(backRow[col],Color.BLACK));
         }
     }
