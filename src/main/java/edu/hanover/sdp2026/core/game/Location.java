@@ -83,4 +83,12 @@ public final class Location {
         }
     }
 
+    public Location add(Shift shift) {
+        return new Location(
+                row + shift.vertical(),
+                col + shift.horizontal()
+        );
+    }
+
+    public record Shift(int vertical, int horizontal) {}
 }
