@@ -89,7 +89,7 @@ public class Game {
 
         for (int col = 1; col <= 8; col++) {
             board.put(Location.fromCoordinates(col,1),
-                    new Piece(backRow[col],Color.WHITE));
+                    new Piece(backRow[col-1],Color.WHITE));
 
             board.put(Location.fromCoordinates(col,2),
                     new Piece(PieceType.Pawn,Color.WHITE));
@@ -98,7 +98,7 @@ public class Game {
                     new Piece(PieceType.Pawn,Color.BLACK));
 
             board.put(Location.fromCoordinates(col,8),
-                    new Piece(backRow[col],Color.BLACK));
+                    new Piece(backRow[col-1],Color.BLACK));
         }
     }
 }
