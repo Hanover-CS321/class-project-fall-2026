@@ -13,7 +13,7 @@ public class Game {
     public static Game createDefaultGame() {
         Game game = new Game();
         game.setupInitialBoard();
-        return  game;
+        return game;
     }
 
     public ArrayList<Move> computeMoves(Location location){
@@ -21,6 +21,10 @@ public class Game {
     }
 
     public void makeMove(Move move){}
+    void putPiece(Location location, PieceType type, Color color) {
+        if (getPiece(location) != null) throw new RuntimeException("space is occupied");
+        board.put(location, new Piece(type, color));
+    }
 
     private void setupInitialBoard() {
         PieceType[] backRow = {
@@ -36,17 +40,14 @@ public class Game {
 
 
         for (int col = 1; col <= 8; col++) {
-            board.put(Location.fromCoordinates(col,1),
-                    new Piece(backRow[col],Color.WHITE));
+            putPiece(Location.fromCoordinates(col, 1), backRow[col - 1], Color.WHITE);
 
-            board.put(Location.fromCoordinates(col,2),
-                    new Piece(PieceType.Pawn,Color.WHITE));
+            putPiece(Location.fromCoordinates(col, 2), PieceType.Pawn, Color.WHITE);
 
-            board.put(Location.fromCoordinates(col,7),
-                    new Piece(PieceType.Pawn,Color.BLACK));
+            putPiece(Location.fromCoordinates(col, 7), PieceType.Pawn, Color.BLACK);
 
-            board.put(Location.fromCoordinates(col,8),
-                    new Piece(backRow[col],Color.BLACK));
+            putPiece(Location.fromCoordinates(col, 8), backRow[col - 1], Color.BLACK);
         }
+    }
     }
 }
