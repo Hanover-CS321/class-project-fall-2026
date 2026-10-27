@@ -16,11 +16,31 @@ public class Game {
         return game;
     }
 
-    public ArrayList<Move> computeMoves(Location location){
-        return new ArrayList<Move>();
+    public ArrayList<Move> computeMoves(Location location) {
+        Piece piece = getPiece(location);
+
+        if (piece == null) return null;
+
+        if (!isColorTurnOf(piece)) return null;
+
+        return switch (piece.getType()) {
+            case Pawn -> computePawnMoves(location, piece);
+            case Rook -> computeRookMoves(location, piece);
+            case Knight -> computeKnightMoves(location, piece);
+            case Bishop -> computeBishopMoves(location, piece);
+            case Queen -> computeQueenMoves(location, piece);
+            case King -> computeKingMoves(location, piece);
+            default -> throw new RuntimeException("no valid PieceType");
+        };
+
     }
 
     public void makeMove(Move move){}
+
+    Piece getPiece(Location location) {
+        return board.getOrDefault(location, null);
+    }
+
     void putPiece(Location location, PieceType type, Color color) {
         if (getPiece(location) != null) throw new RuntimeException("space is occupied");
         board.put(location, new Piece(type, color));
@@ -49,5 +69,32 @@ public class Game {
             putPiece(Location.fromCoordinates(col, 8), backRow[col - 1], Color.BLACK);
         }
     }
+
+    private boolean isColorTurnOf(Piece piece) {
+        return piece.getColor() == turn;
+    }
+
+    private ArrayList<Move> computePawnMoves(Location location, Piece piece) {
+        throw new RuntimeException("not implemented yet");
+    }
+
+    private ArrayList<Move> computeRookMoves(Location location, Piece piece) {
+        throw new RuntimeException("not implemented yet");
+    }
+
+    private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {
+        throw new RuntimeException("not implemented yet");
+    }
+
+    private ArrayList<Move> computeBishopMoves(Location location, Piece piece) {
+        throw new RuntimeException("not implemented yet");
+    }
+
+    private ArrayList<Move> computeQueenMoves(Location location, Piece piece) {
+        throw new RuntimeException("not implemented yet");
+    }
+
+    private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
+        throw new RuntimeException("not implemented yet");
     }
 }
