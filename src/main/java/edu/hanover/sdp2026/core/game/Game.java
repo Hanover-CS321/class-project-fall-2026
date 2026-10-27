@@ -35,7 +35,16 @@ public class Game {
 
     }
 
-    public void makeMove(Move move){}
+    public void makeMove(Move move) {
+    }
+
+    public Color getTurn() {
+        return turn;
+    }
+
+    public void setTurn(Color turn) {
+        this.turn = turn;
+    }
 
     Piece getPiece(Location location) {
         return board.getOrDefault(location, null);
