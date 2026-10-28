@@ -88,7 +88,39 @@ public class Game {
     }
 
     private ArrayList<Move> computeRookMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+        ArrayList<Move> moves = new ArrayList<>();
+
+        int[][] directions = {
+                {1, 0},
+                {-1, 0},
+                {0, 1},
+                {0, -1}
+        };
+
+        for (int[] direction : directions) {
+            int col = location.col() + direction[0];
+            int row = location.row() + direction[1];
+
+            while (col >= 1 && col <= 8 && row >= 1 && row <= 8) {
+                Location destination = Location.fromCoordinates(col, row);
+                Piece occupant = getPiece(destination);
+
+                if (occupant == null) {
+                    moves.add(new Move(piece, location, destination));
+                } else {
+                    if (occupant.getColor() != piece.getColor()) {
+                        moves.add(new Move(piece, location, destination));
+                    }
+
+                    break;
+                }
+
+                col += direction[0];
+                row += direction[1];
+            }
+        }
+
+        return moves;
     }
 
     private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {
