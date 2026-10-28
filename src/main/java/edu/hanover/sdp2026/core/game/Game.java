@@ -89,18 +89,21 @@ public class Game {
         ArrayList<Move> moves = new ArrayList<>();
 
         int[][] directions = {
-                {1, 0},
-                {-1, 0},
-                {0, 1},
-                {0, -1}
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1}
         };
 
         for (int[] direction : directions) {
-            int col = location.col() + direction[0];
-            int row = location.row() + direction[1];
+            Location.Shift shift = new Location.Shift(direction[0], direction[1]);
+            Location current = location;
+
+            int col = current.col() + direction[0];
+            int row = current.row() + direction[1];
 
             while (col >= 1 && col <= 8 && row >= 1 && row <= 8) {
-                Location destination = Location.fromCoordinates(col, row);
+                Location destination = current.add(shift);
                 Piece occupant = getPiece(destination);
 
                 if (occupant == null) {
@@ -113,6 +116,7 @@ public class Game {
                     break;
                 }
 
+                current = destination;
                 col += direction[0];
                 row += direction[1];
             }
