@@ -83,8 +83,49 @@ public class Game {
         return piece.getColor() == turn;
     }
 
-    private ArrayList<Move> computePawnMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+    public ArrayList<Move> computePawnMoves(Location location, Piece piece) {
+        ArrayList<Move> moves = new ArrayList<>();
+        int col = location.col();
+        int row = location.row();
+
+        int rowChange;
+        if (piece.getColor() == Color.WHITE) rowChange = 1;
+        else rowChange = -1;
+        int doubleRowChange = rowChange * 2;
+
+        int newCol;
+        int newRow = row + rowChange;
+        int newDoubleRow = row + doubleRowChange;
+
+
+        newCol = col - 1;
+        if (inBoardRange(newCol, newRow)) {
+            Location newLocation = Location.fromCoordinates(newCol, newRow);
+            if (locationOccupiedByOpponentOf(piece, newLocation)) moves.add(new Move(piece, location, newLocation));
+        }
+
+        newCol = col;
+        if (inBoardRange(newCol, newRow)) {
+            Location newLocation = Location.fromCoordinates(newCol, newRow);
+            if (locationNotOccupied(newLocation)) {
+                moves.add(new Move(piece, location, newLocation));
+                if (inBoardRange(newCol, newDoubleRow) && !piece.hasMoved()) {
+                    newLocation = Location.fromCoordinates(newCol, newDoubleRow);
+                    if (locationNotOccupied(newLocation)) {
+                        moves.add(new Move(piece, location, newLocation));
+                    }
+                }
+            }
+        }
+
+        newCol = col + 1;
+        if (inBoardRange(newCol, newRow)) {
+            Location newLocation = Location.fromCoordinates(newCol, newRow);
+            if (locationOccupiedByOpponentOf(piece, newLocation)) moves.add(new Move(piece, location, newLocation));
+        }
+
+
+        return moves;
     }
 
     private ArrayList<Move> computeRookMoves(Location location, Piece piece) {
@@ -105,5 +146,23 @@ public class Game {
 
     private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
         throw new RuntimeException("not implemented yet");
+    }
+
+    private static boolean inBoardRange(int newCol, int newRow) {
+        return (newCol >= 1) && (newCol <= 8) && (newRow >= 1) && (newRow <= 8);
+    }
+
+    private boolean locationNotOccupied(Location location) {
+        return getPiece(location) == null;
+    }
+
+    private boolean locationOccupiedByAllyOf(Piece piece, Location location) {
+        Piece otherPiece = getPiece(location);
+        return otherPiece != null && otherPiece.getColor() == piece.getColor();
+    }
+
+    private boolean locationOccupiedByOpponentOf(Piece piece, Location location) {
+        Piece otherPiece = getPiece(location);
+        return otherPiece != null && otherPiece.getColor() != piece.getColor();
     }
 }
