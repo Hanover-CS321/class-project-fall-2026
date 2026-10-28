@@ -9,6 +9,6 @@ public final class Main {
         TUIMain tui = new TUIMain();
         gameManager.setPresenter(tui);
         tui.setInteractor(gameManager);
-        tui.start();
+        gameManager.start();
     }
 }
