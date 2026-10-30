@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -98,7 +101,61 @@ class GameTest {
 
     @Nested
     class KnightMoveTests {
+        @Test
+        void computesAll8Possible () {
+            Game game = new Game();
+            Location loc = Location.fromString("d4");
+            Piece knight = new Piece(PieceType.Knight, Color.WHITE);
+            game.putPiece(loc, knight.getType(), knight.getColor());
+            Location[] expectedMoves = {
+                    loc.add(new Location.Shift(2, 1)),
+                    loc.add(new Location.Shift(2, -1)),
+                    loc.add(new Location.Shift(-2, 1)),
+                    loc.add(new Location.Shift(-2, -1)),
+                    loc.add(new Location.Shift(1, 2)),
+                    loc.add(new Location.Shift(1, -2)),
+                    loc.add(new Location.Shift(-1, 2)),
+                    loc.add(new Location.Shift(-1, -2))
+            };
+            ArrayList<Move> moves = game.computeMoves(loc);
 
+            Set<Location> actualMoves = createActualMoves(moves);
+            Set<Location> expectedMoveSet = createExpectedMoveSet(expectedMoves);
+
+            assertEquals(expectedMoveSet, actualMoves);
+        }
+
+        @Test
+        void computeWithSomeOutOfBounds () {
+            Game game = new Game();
+            Location loc = Location.fromString("h4");
+            Piece knight = new Piece(PieceType.Knight, Color.WHITE);
+            game.putPiece(loc, knight.getType(), knight.getColor());
+
+            Location[] expectedMoves = {
+                    loc.add(new Location.Shift(-1, -2)), // g2
+                    loc.add(new Location.Shift(-2, -1)), // f3
+                    loc.add(new Location.Shift(-2, 1)),  // f5
+                    loc.add(new Location.Shift(-1, 2))   // g6
+            };
+            ArrayList<Move> moves = game.computeMoves(loc);
+
+            Set<Location> actualMoves = createActualMoves(moves);
+            Set<Location> expectedMoveSet = createExpectedMoveSet(expectedMoves);
+            assertEquals(expectedMoveSet, actualMoves);
+        }
+
+        private static Set<Location> createExpectedMoveSet(Location[] expectedMoves) {
+            return new HashSet<>(Arrays.asList(expectedMoves));
+        }
+
+        private static Set<Location> createActualMoves(ArrayList<Move> moves) {
+            Set<Location> actualMoves = new HashSet<>();
+            for (Move move : moves) {
+                actualMoves.add(move.getTo());
+            }
+            return actualMoves;
+        }
     }
 
     @Nested

@@ -92,7 +92,25 @@ public class Game {
     }
 
     private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+        //all 8 possibilities
+        ArrayList<Move> validMoves = new ArrayList<>();
+        Location[] knightMovesNotChecked = {
+                location.add(new Location.Shift(2, 1)),
+                location.add(new Location.Shift(2, -1)),
+                location.add(new Location.Shift(-2, 1)),
+                location.add(new Location.Shift(-2, -1)),
+                location.add(new Location.Shift(1, 2)),
+                location.add(new Location.Shift(1, -2)),
+                location.add(new Location.Shift(-1, 2)),
+                location.add(new Location.Shift(-1, -2))
+        };
+        for (Location l : knightMovesNotChecked) {
+            if (l.row() >= 1 && l.row() <= 8
+                    && l.col() >= 1 && l.col() <= 8) {
+                validMoves.add(new Move(piece, location, l));
+            }
+        }
+        return validMoves;
     }
 
     private ArrayList<Move> computeBishopMoves(Location location, Piece piece) {
