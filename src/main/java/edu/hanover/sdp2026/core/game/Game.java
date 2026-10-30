@@ -1,8 +1,6 @@
 package edu.hanover.sdp2026.core.game;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Game {
     private Map<Location, Piece> board = new HashMap<>();
@@ -128,4 +126,5 @@ public class Game {
     private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
         throw new RuntimeException("not implemented yet");
     }
+
 }

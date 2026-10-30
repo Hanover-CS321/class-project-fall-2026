@@ -1,5 +1,6 @@
 package edu.hanover.sdp2026.core.game;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -108,4 +109,11 @@ public final class Location {
     }
 
     public record Shift(int x, int y) {}
+
+    public List<Location> getValidDestinations (List<Location.Shift> shifts) {
+        return shifts.stream().map(this::shift)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
 }
