@@ -100,7 +100,11 @@ public class Game {
     }
 
     private ArrayList<Move> computeQueenMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+        //Queen moves is just bishop combine with rook
+        ArrayList<Move> queenMoves = computeBishopMoves(location, piece);
+        queenMoves.addAll(computeRookMoves(location, piece));
+        return queenMoves;
+        //throw new RuntimeException("not implemented yet");
     }
 
     private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
