@@ -1,6 +1,7 @@
 package edu.hanover.sdp2026.core.game;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public final class Location {
     private final int col;
@@ -44,7 +45,15 @@ public final class Location {
     }
 
     private static void throwIfNotInInputRange(int num, String message) {
-        if (num < 1 || num > 8) throw new InvalidLocationException(message);
+        if (!inRange(num)) throw new InvalidLocationException(message);
+    }
+
+    private static boolean inRange(int num) {
+        return num >= 1 && num <= 8;
+    }
+
+    private static boolean inRange(int num1, int num2) {
+        return (num1 >= 1 && num1 <= 8) && (num2 >= 1 && num2 <= 8);
     }
 
     public int col() {
@@ -83,11 +92,19 @@ public final class Location {
         }
     }
 
+    @Deprecated
     public Location add(Shift shift) {
         return new Location(
                 col() + shift.x,
                 row() + shift.y
         );
+    }
+
+    public Optional<Location> shift(Shift shift) {
+        int newX = col() + shift.x;
+        int newY = row() + shift.y;
+        if(inRange(newX, newY)) return Optional.of(new Location(newX, newY));
+        return Optional.empty();
     }
 
     public record Shift(int x, int y) {}
