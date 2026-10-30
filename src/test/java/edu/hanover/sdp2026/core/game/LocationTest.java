@@ -2,6 +2,9 @@ package edu.hanover.sdp2026.core.game;
 
 import org.junit.jupiter.api.Test;
 
+
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class LocationTest {
@@ -31,5 +34,19 @@ class LocationTest {
 
     @Test
     void rowExistsAsExpected() {
+    }
+
+    @Test 
+    void shiftMethodWithValidDestination() {
+        Optional<Location> location = Location.fromCoordinates(1,1).shift(new Location.Shift(1,0));
+        assertTrue(location.isPresent());
+        assertEquals(2, location.get().col());
+        assertEquals(1, location.get().row());
+    }
+
+    @Test
+    void shiftMethodWithInvalidDestination() {
+        Optional<Location> location = Location.fromCoordinates(1,1).shift(new Location.Shift(-1,0));
+        assertTrue(location.isEmpty());
     }
 }
