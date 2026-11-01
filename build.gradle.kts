@@ -1,6 +1,9 @@
+import net.ltgt.gradle.errorprone.errorprone
+
 plugins {
     application
     id("com.diffplug.spotless") version "8.10.4"
+    id("net.ltgt.errorprone") version "5.2.0"
 }
 
 group = "edu.hanover.sdp2026"
@@ -16,6 +19,8 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    errorprone("com.google.errorprone:error_prone_core:2.51.0")
 }
 
 java {
@@ -26,6 +31,12 @@ java {
 
 application {
     mainClass = "edu.hanover.sdp2026.Main"
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    // Serial warnings are noise for RuntimeException subclasses without a serialVersionUID.
+    options.compilerArgs.add("-Xlint:all,-serial")
+    options.errorprone.disableWarningsInGeneratedCode.set(true)
 }
 
 tasks.test {
