@@ -5,21 +5,89 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
-  build:
+  format:
+    name: Formatting (run ./gradlew spotlessApply)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Check formatting
+        run: ./gradlew spotlessCheck
+
+      - name: Explain the fix
+        if: failure()
+        run: |
+          {
+            echo "## Formatting failed"
+            echo ""
+            echo 'Run `./gradlew spotlessApply` locally, then commit the result and push.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  build:
+    name: Build (lint, tests, coverage)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Run checks
-        run: ./gradlew check
+        run: ./gradlew check --continue
+
+      - name: Summarize failures
+        if: failure()
+        run: |
+          {
+            echo "## Check failures"
+            echo ""
+            echo 'Run `./gradlew check` locally to reproduce. Reports are attached to this run.'
+            echo ""
+            echo "- Checkstyle: \`build/reports/checkstyle/main.html\` and \`test.html\`"
+            echo "- Tests: \`build/reports/tests/test/index.html\`"
+            echo "- Coverage: \`build/reports/jacoco/test/html/index.html\`"
+            echo ""
+            for f in build/reports/checkstyle/main.txt build/reports/checkstyle/test.txt; do
+              if [ -f "$f" ]; then
+                echo "### $f"
+                echo '```'
+                head -n 100 "$f"
+                echo '```'
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports
+          path: |
+            build/reports/
+            build/test-results/
+          retention-days: 14
