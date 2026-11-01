@@ -3,6 +3,7 @@ import net.ltgt.gradle.errorprone.errorprone
 plugins {
     application
     checkstyle
+    jacoco
     id("com.diffplug.spotless") version "8.10.4"
     id("net.ltgt.errorprone") version "5.2.0"
 }
@@ -54,6 +55,18 @@ tasks.withType<Checkstyle>().configureEach {
         xml.required = true
         html.required = true
     }
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestReport)
 }
 
 spotless {
