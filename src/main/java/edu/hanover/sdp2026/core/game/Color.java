@@ -8,4 +8,3 @@ public enum Color {
         return this == WHITE ? BLACK : WHITE;
     }
 }
-

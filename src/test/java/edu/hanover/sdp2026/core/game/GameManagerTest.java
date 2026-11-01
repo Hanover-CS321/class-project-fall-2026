@@ -1,11 +1,11 @@
 package edu.hanover.sdp2026.core.game;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import edu.hanover.sdp2026.core.GameManager;
 import edu.hanover.sdp2026.core.Presenter;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GameManagerTest {
 
@@ -33,9 +33,7 @@ class GameManagerTest {
     void cannotStartWithoutPresenter() {
         GameManager gameManager = new GameManager();
 
-        assertThrows(
-                IllegalStateException.class, () -> gameManager.start()
-        );
+        assertThrows(IllegalStateException.class, () -> gameManager.start());
     }
 
     @Test

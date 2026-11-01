@@ -8,7 +8,6 @@ public final class Location {
     private final int col;
     private final int row;
 
-
     private Location(int col, int row) {
         this.row = row;
         this.col = col;
@@ -21,8 +20,7 @@ public final class Location {
     }
 
     public static Location fromString(String string) {
-        if (string.length() != 2)
-            throw new InvalidLocationException("only String of length = 2 is accepted");
+        if (string.length() != 2) throw new InvalidLocationException("only String of length = 2 is accepted");
 
         char colLetter = string.charAt(0);
         int row = string.charAt(1) - '0';
@@ -70,8 +68,7 @@ public final class Location {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (Location) obj;
-        return this.col == that.col &&
-                this.row == that.row;
+        return this.col == that.col && this.row == that.row;
     }
 
     @Override
@@ -81,11 +78,8 @@ public final class Location {
 
     @Override
     public String toString() {
-        return "Location[" +
-                "col=" + col + ", " +
-                "row=" + row + ']';
+        return "Location[" + "col=" + col + ", " + "row=" + row + ']';
     }
-
 
     public static class InvalidLocationException extends RuntimeException {
         public InvalidLocationException(String message) {
@@ -95,23 +89,21 @@ public final class Location {
 
     @Deprecated
     public Location add(Shift shift) {
-        return new Location(
-                col() + shift.x,
-                row() + shift.y
-        );
+        return new Location(col() + shift.x, row() + shift.y);
     }
 
     public Optional<Location> shift(Shift shift) {
         int newX = col() + shift.x;
         int newY = row() + shift.y;
-        if(inRange(newX, newY)) return Optional.of(new Location(newX, newY));
+        if (inRange(newX, newY)) return Optional.of(new Location(newX, newY));
         return Optional.empty();
     }
 
     public record Shift(int x, int y) {}
 
-    public List<Location> getValidDestinations (List<Location.Shift> shifts) {
-        return shifts.stream().map(this::shift)
+    public List<Location> getValidDestinations(List<Location.Shift> shifts) {
+        return shifts.stream()
+                .map(this::shift)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();

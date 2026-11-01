@@ -1,10 +1,10 @@
 package edu.hanover.sdp2026.tui;
 
-import edu.hanover.sdp2026.core.Interactor;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+import edu.hanover.sdp2026.core.Interactor;
+import org.junit.jupiter.api.Test;
 
 class TUIMainTest {
     @Test
@@ -16,5 +16,4 @@ class TUIMainTest {
         main.start();
         verify(interactor, times(1)).start();
     }
-
 }

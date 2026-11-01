@@ -1,6 +1,8 @@
 package edu.hanover.sdp2026.core.game;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Game {
     private Map<Location, Piece> board = new HashMap<>();
@@ -30,11 +32,9 @@ public class Game {
             case King -> computeKingMoves(location, piece);
             default -> throw new RuntimeException("no valid PieceType");
         };
-
     }
 
-    public void makeMove(Move move) {
-    }
+    public void makeMove(Move move) {}
 
     public Color getTurn() {
         return turn;
@@ -55,16 +55,15 @@ public class Game {
 
     private void setupInitialBoard() {
         PieceType[] backRow = {
-                PieceType.Rook,
-                PieceType.Knight,
-                PieceType.Bishop,
-                PieceType.Queen,
-                PieceType.King,
-                PieceType.Bishop,
-                PieceType.Knight,
-                PieceType.Rook
+            PieceType.Rook,
+            PieceType.Knight,
+            PieceType.Bishop,
+            PieceType.Queen,
+            PieceType.King,
+            PieceType.Bishop,
+            PieceType.Knight,
+            PieceType.Rook
         };
-
 
         for (int col = 1; col <= 8; col++) {
             putPiece(Location.fromCoordinates(col, 1), backRow[col - 1], Color.WHITE);
@@ -90,21 +89,20 @@ public class Game {
     }
 
     private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {
-        //all 8 possibilities
+        // all 8 possibilities
         ArrayList<Move> validMoves = new ArrayList<>();
         Location[] knightMovesNotChecked = {
-                location.add(new Location.Shift(2, 1)),
-                location.add(new Location.Shift(2, -1)),
-                location.add(new Location.Shift(-2, 1)),
-                location.add(new Location.Shift(-2, -1)),
-                location.add(new Location.Shift(1, 2)),
-                location.add(new Location.Shift(1, -2)),
-                location.add(new Location.Shift(-1, 2)),
-                location.add(new Location.Shift(-1, -2))
+            location.add(new Location.Shift(2, 1)),
+            location.add(new Location.Shift(2, -1)),
+            location.add(new Location.Shift(-2, 1)),
+            location.add(new Location.Shift(-2, -1)),
+            location.add(new Location.Shift(1, 2)),
+            location.add(new Location.Shift(1, -2)),
+            location.add(new Location.Shift(-1, 2)),
+            location.add(new Location.Shift(-1, -2))
         };
         for (Location l : knightMovesNotChecked) {
-            if (l.row() >= 1 && l.row() <= 8
-                    && l.col() >= 1 && l.col() <= 8) {
+            if (l.row() >= 1 && l.row() <= 8 && l.col() >= 1 && l.col() <= 8) {
                 validMoves.add(new Move(piece, location, l));
             }
         }
@@ -116,15 +114,14 @@ public class Game {
     }
 
     private ArrayList<Move> computeQueenMoves(Location location, Piece piece) {
-        //Queen moves is just bishop combine with rook
+        // Queen moves is just bishop combine with rook
         ArrayList<Move> queenMoves = computeBishopMoves(location, piece);
         queenMoves.addAll(computeRookMoves(location, piece));
         return queenMoves;
-        //throw new RuntimeException("not implemented yet");
+        // throw new RuntimeException("not implemented yet");
     }
 
     private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
         throw new RuntimeException("not implemented yet");
     }
-
 }
