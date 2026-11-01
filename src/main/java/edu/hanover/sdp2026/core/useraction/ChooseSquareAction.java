@@ -1,6 +1,7 @@
 package edu.hanover.sdp2026.core.useraction;
 
 import edu.hanover.sdp2026.core.game.Location;
+import java.util.Objects;
 
 public final class ChooseSquareAction implements UserAction {
 
@@ -18,5 +19,10 @@ public final class ChooseSquareAction implements UserAction {
 
         ChooseSquareAction other = (ChooseSquareAction) obj;
         return location.equals(other.location);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(location);
     }
 }

@@ -1,6 +1,7 @@
 package edu.hanover.sdp2026.core.useraction;
 
 import edu.hanover.sdp2026.core.game.PieceType;
+import java.util.Objects;
 
 public final class PromotePawnAction implements UserAction {
 
@@ -18,5 +19,10 @@ public final class PromotePawnAction implements UserAction {
 
         PromotePawnAction other = (PromotePawnAction) obj;
         return pieceType == other.pieceType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(pieceType);
     }
 }
