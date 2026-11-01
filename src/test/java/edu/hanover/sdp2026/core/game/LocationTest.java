@@ -1,44 +1,38 @@
 package edu.hanover.sdp2026.core.game;
 
-import org.junit.jupiter.api.Test;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class LocationTest {
 
     @Test
     void fromCoordinatesAssertsPropperRowAndColValues() {
-        assertEquals(1, Location.fromCoordinates(1,1).col());
-        assertEquals(1,Location.fromCoordinates(1,1).row());
+        assertEquals(1, Location.fromCoordinates(1, 1).col());
+        assertEquals(1, Location.fromCoordinates(1, 1).row());
     }
 
     @Test
     void fromStringAssertsPropperRowAndColValues() {
-        assertEquals(4,Location.fromString("d1").col());
-        assertEquals(1,Location.fromString("d1").row());
-
+        assertEquals(4, Location.fromString("d1").col());
+        assertEquals(1, Location.fromString("d1").row());
     }
 
-
     @Test
-    void getStringEquivalent(){
+    void getStringEquivalent() {
         assertEquals("a1", Location.fromString("a1").getStringEquivalent());
     }
 
     @Test
-    void colExistsAsExpected() {
-    }
+    void colExistsAsExpected() {}
 
     @Test
-    void rowExistsAsExpected() {
-    }
+    void rowExistsAsExpected() {}
 
-    @Test 
+    @Test
     void shiftMethodWithValidDestination() {
-        Optional<Location> location = Location.fromCoordinates(1,1).shift(new Location.Shift(1,0));
+        Optional<Location> location = Location.fromCoordinates(1, 1).shift(new Location.Shift(1, 0));
         assertTrue(location.isPresent());
         assertEquals(2, location.get().col());
         assertEquals(1, location.get().row());
@@ -46,7 +40,7 @@ class LocationTest {
 
     @Test
     void shiftMethodWithInvalidDestination() {
-        Optional<Location> location = Location.fromCoordinates(1,1).shift(new Location.Shift(-1,0));
+        Optional<Location> location = Location.fromCoordinates(1, 1).shift(new Location.Shift(-1, 0));
         assertTrue(location.isEmpty());
     }
 }

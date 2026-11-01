@@ -11,7 +11,5 @@ public class GUIMain implements Presenter {
         this.interactor = interactor;
     }
 
-    public void start() {
-
-    }
+    public void start() {}
 }

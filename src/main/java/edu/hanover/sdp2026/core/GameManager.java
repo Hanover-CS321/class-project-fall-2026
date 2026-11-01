@@ -16,9 +16,7 @@ public class GameManager implements Interactor {
 
     public void start() {
         if (presenter == null) {
-            throw new IllegalStateException(
-                    "A presenter must be set before starting."
-            );
+            throw new IllegalStateException("A presenter must be set before starting.");
         }
         presenter.start();
     }
@@ -36,39 +34,27 @@ public class GameManager implements Interactor {
         } else if (action instanceof ResignAction) {
             handleResign((ResignAction) action);
         } else {
-            throw new IllegalArgumentException(
-                    "Unsupported action: " + action
-            );
+            throw new IllegalArgumentException("Unsupported action: " + action);
         }
     }
 
     private void handleChooseSquare(ChooseSquareAction action) {
-        throw new UnsupportedOperationException(
-                "ChooseSquare processing not yet implemented."
-        );
+        throw new UnsupportedOperationException("ChooseSquare processing not yet implemented.");
     }
 
     private void handlePromotePawn(PromotePawnAction action) {
-        throw new UnsupportedOperationException(
-                "PromotePawn processing not yet implemented."
-        );
+        throw new UnsupportedOperationException("PromotePawn processing not yet implemented.");
     }
 
     private void handleUndo(UndoAction action) {
-        throw new UnsupportedOperationException(
-                "Undo processing not yet implemented."
-        );
+        throw new UnsupportedOperationException("Undo processing not yet implemented.");
     }
 
     private void handleNewGame(NewGameAction action) {
-        throw new UnsupportedOperationException(
-                "NewGame processing not yet implemented."
-        );
+        throw new UnsupportedOperationException("NewGame processing not yet implemented.");
     }
 
     private void handleResign(ResignAction action) {
-        throw new UnsupportedOperationException(
-                "Resign processing not yet implemented."
-        );
+        throw new UnsupportedOperationException("Resign processing not yet implemented.");
     }
 }

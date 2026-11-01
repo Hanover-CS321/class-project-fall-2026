@@ -1,8 +1,8 @@
 package edu.hanover.sdp2026.core.game;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class PieceTypeTest {
 
@@ -15,5 +15,4 @@ class PieceTypeTest {
         assertEquals("K", PieceType.King.getAbbr());
         assertEquals("Q", PieceType.Queen.getAbbr());
     }
-
 }
