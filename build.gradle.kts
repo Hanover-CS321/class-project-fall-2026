@@ -2,6 +2,7 @@ import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
     application
+    checkstyle
     id("com.diffplug.spotless") version "8.10.4"
     id("net.ltgt.errorprone") version "5.2.0"
 }
@@ -41,6 +42,18 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+checkstyle {
+    configFile = file("config/checkstyle/checkstyle.xml")
+    maxWarnings = 0
+}
+
+tasks.withType<Checkstyle>().configureEach {
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }
 
 spotless {
