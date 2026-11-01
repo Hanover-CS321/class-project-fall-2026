@@ -1,5 +1,6 @@
 plugins {
     application
+    id("com.diffplug.spotless") version "8.10.4"
 }
 
 group = "edu.hanover.sdp2026"
@@ -29,4 +30,16 @@ application {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+spotless {
+    java {
+        target("src/**/*.java")
+        palantirJavaFormat("2.103.0")
+    }
+    format("misc") {
+        target("*.md", ".gitignore", "*.gradle.kts", ".github/**/*.yml")
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }
