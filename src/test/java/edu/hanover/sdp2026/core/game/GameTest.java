@@ -84,18 +84,17 @@ class GameTest {
             Location loc = Location.fromString("d4");
             Piece knight = new Piece(PieceType.Knight, Color.WHITE);
             game.putPiece(loc, knight.getType(), knight.getColor());
-            Location[] expectedMoves = {
-                loc.add(new Location.Shift(2, 1)),
-                loc.add(new Location.Shift(2, -1)),
-                loc.add(new Location.Shift(-2, 1)),
-                loc.add(new Location.Shift(-2, -1)),
-                loc.add(new Location.Shift(1, 2)),
-                loc.add(new Location.Shift(1, -2)),
-                loc.add(new Location.Shift(-1, 2)),
-                loc.add(new Location.Shift(-1, -2))
-            };
+            Set<Location> expected = Set.of(
+                    Location.fromCoordinates(6, 5),
+                    Location.fromCoordinates(6, 3),
+                    Location.fromCoordinates(2, 5),
+                    Location.fromCoordinates(2, 3),
+                    Location.fromCoordinates(5, 6),
+                    Location.fromCoordinates(5, 2),
+                    Location.fromCoordinates(3, 6),
+                    Location.fromCoordinates(3, 2)
+            );
             ArrayList<Move> moves = game.computeMoves(loc);
-
             Set<Location> actualMoves = createActualMoves(moves);
             Set<Location> expectedMoveSet = createExpectedMoveSet(expectedMoves);
 
@@ -109,21 +108,57 @@ class GameTest {
             Piece knight = new Piece(PieceType.Knight, Color.WHITE);
             game.putPiece(loc, knight.getType(), knight.getColor());
 
-            Location[] expectedMoves = {
-                loc.add(new Location.Shift(-1, -2)), // g2
-                loc.add(new Location.Shift(-2, -1)), // f3
-                loc.add(new Location.Shift(-2, 1)), // f5
-                loc.add(new Location.Shift(-1, 2)) // g6
-            };
+            Set<Location> expected = Set.of(
+                    Location.fromCoordinates(7, 2), // g2
+                    Location.fromCoordinates(6, 3), // f3
+                    Location.fromCoordinates(6, 5), // f5
+                    Location.fromCoordinates(7, 6)  // g6
+            );
+
             ArrayList<Move> moves = game.computeMoves(loc);
 
             Set<Location> actualMoves = createActualMoves(moves);
-            Set<Location> expectedMoveSet = createExpectedMoveSet(expectedMoves);
-            assertEquals(expectedMoveSet, actualMoves);
+            assertEquals(expected, actualMoves);
         }
 
-        private static Set<Location> createExpectedMoveSet(Location[] expectedMoves) {
-            return new HashSet<>(Arrays.asList(expectedMoves));
+        @Test
+        void EnemyInWay () {
+            Game game = new Game();
+            Location loc = Location.fromString("h4");
+            Piece knight = new Piece(PieceType.Knight, Color.WHITE);
+            game.putPiece(loc, knight.getType(), knight.getColor());
+            game.putPiece(Location.fromCoordinates(7,6), PieceType.Knight, Color.BLACK);
+            game.putPiece(Location.fromCoordinates(7,2), PieceType.Knight, Color.BLACK);
+
+            Set<Location> expected = Set.of(
+                    Location.fromCoordinates(7, 2), // g2
+                    Location.fromCoordinates(6, 3), // f3
+                    Location.fromCoordinates(6, 5), // f5
+                    Location.fromCoordinates(7, 6)  // g6
+            );
+            ArrayList<Move> moves = game.computeMoves(loc);
+
+            Set<Location> actualMoves = createActualMoves(moves);
+            assertEquals(expected, actualMoves);
+        }
+
+        @Test
+        void TeamInWay () {
+            Game game = new Game();
+            Location loc = Location.fromString("h4");
+            Piece knight = new Piece(PieceType.Knight, Color.WHITE);
+            game.putPiece(loc, knight.getType(), knight.getColor());
+            game.putPiece(Location.fromCoordinates(7,6), PieceType.Knight, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(7,2), PieceType.Knight, Color.WHITE);
+
+            Set<Location> expected = Set.of(
+                    Location.fromCoordinates(6, 3), // f3
+                    Location.fromCoordinates(6, 5) // f5
+            );
+            ArrayList<Move> moves = game.computeMoves(loc);
+
+            Set<Location> actualMoves = createActualMoves(moves);
+            assertEquals(expected, actualMoves);
         }
 
         private static Set<Location> createActualMoves(ArrayList<Move> moves) {

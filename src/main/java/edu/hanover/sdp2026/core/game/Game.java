@@ -2,6 +2,7 @@ package edu.hanover.sdp2026.core.game;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Game {
@@ -65,6 +66,7 @@ public class Game {
             PieceType.Rook
         };
 
+
         for (int col = 1; col <= 8; col++) {
             putPiece(Location.fromCoordinates(col, 1), backRow[col - 1], Color.WHITE);
 
@@ -89,20 +91,21 @@ public class Game {
     }
 
     private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {
-        // all 8 possibilities
+        //all 8 possibilities
         ArrayList<Move> validMoves = new ArrayList<>();
-        Location[] knightMovesNotChecked = {
-            location.add(new Location.Shift(2, 1)),
-            location.add(new Location.Shift(2, -1)),
-            location.add(new Location.Shift(-2, 1)),
-            location.add(new Location.Shift(-2, -1)),
-            location.add(new Location.Shift(1, 2)),
-            location.add(new Location.Shift(1, -2)),
-            location.add(new Location.Shift(-1, 2)),
-            location.add(new Location.Shift(-1, -2))
-        };
-        for (Location l : knightMovesNotChecked) {
-            if (l.row() >= 1 && l.row() <= 8 && l.col() >= 1 && l.col() <= 8) {
+        List<Location.Shift> knightShifts = List.of(
+                new Location.Shift(2, 1),
+                new Location.Shift(2, -1),
+                new Location.Shift(-2, 1),
+                new Location.Shift(-2, -1),
+                new Location.Shift(1, 2),
+                new Location.Shift(1, -2),
+                new Location.Shift(-1, 2),
+                new Location.Shift(-1, -2)
+        );
+        List<Location> valid = location.getValidDestinations(knightShifts);
+        for (Location l : valid) {
+            if (getPiece(l) == null || getPiece(l).getColor() != piece.getColor()) {
                 validMoves.add(new Move(piece, location, l));
             }
         }
