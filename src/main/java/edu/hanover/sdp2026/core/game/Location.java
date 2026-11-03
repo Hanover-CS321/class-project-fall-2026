@@ -87,10 +87,6 @@ public final class Location {
         }
     }
 
-    @Deprecated
-    public Location add(Shift shift) {
-        return new Location(col() + shift.x, row() + shift.y);
-    }
 
     public Optional<Location> shift(Shift shift) {
         int newX = col() + shift.x;
