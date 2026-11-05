@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Game {
     private Map<Location, Piece> board = new HashMap<>();
@@ -86,7 +87,34 @@ public class Game {
     }
 
     private ArrayList<Move> computeRookMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+        ArrayList<Move> validMoves = new ArrayList<>();
+
+        List<Location.Shift> rookShifts = List.of(
+                new Location.Shift(1, 0),
+                new Location.Shift(-1, 0),
+                new Location.Shift(0, 1),
+                new Location.Shift(0, -1));
+
+        for (Location.Shift shift : rookShifts) {
+            Optional<Location> currentOptional = location.shift(shift);
+
+            while (currentOptional.isPresent()) {
+                Location destination = currentOptional.get();
+                Piece occupant = getPiece(destination);
+
+                if (occupant == null || occupant.getColor() != piece.getColor()) {
+                    validMoves.add(new Move(piece, location, destination));
+                }
+
+                if (occupant != null) {
+                    break;
+                }
+
+                currentOptional = destination.shift(shift);
+            }
+        }
+
+        return validMoves;
     }
 
     private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {

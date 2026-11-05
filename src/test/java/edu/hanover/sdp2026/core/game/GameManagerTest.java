@@ -19,7 +19,7 @@ class GameManagerTest {
     }
 
     @Test
-    void startWithPresenterCallsPresenterStartExactlyOnce() {
+    void canStartGameManager() {
         GameManager gameManager = new GameManager();
         TestPresenter presenter = new TestPresenter();
 
