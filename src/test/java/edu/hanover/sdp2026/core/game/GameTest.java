@@ -3,7 +3,6 @@ package edu.hanover.sdp2026.core.game;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
@@ -92,13 +91,10 @@ class GameTest {
                     Location.fromCoordinates(5, 6),
                     Location.fromCoordinates(5, 2),
                     Location.fromCoordinates(3, 6),
-                    Location.fromCoordinates(3, 2)
-            );
+                    Location.fromCoordinates(3, 2));
             ArrayList<Move> moves = game.computeMoves(loc);
             Set<Location> actualMoves = createActualMoves(moves);
-            Set<Location> expectedMoveSet = createExpectedMoveSet(expectedMoves);
-
-            assertEquals(expectedMoveSet, actualMoves);
+            assertEquals(expected, actualMoves);
         }
 
         @Test
@@ -112,8 +108,8 @@ class GameTest {
                     Location.fromCoordinates(7, 2), // g2
                     Location.fromCoordinates(6, 3), // f3
                     Location.fromCoordinates(6, 5), // f5
-                    Location.fromCoordinates(7, 6)  // g6
-            );
+                    Location.fromCoordinates(7, 6) // g6
+                    );
 
             ArrayList<Move> moves = game.computeMoves(loc);
 
@@ -122,20 +118,20 @@ class GameTest {
         }
 
         @Test
-        void EnemyInWay () {
+        void enemyInWay() {
             Game game = new Game();
             Location loc = Location.fromString("h4");
             Piece knight = new Piece(PieceType.Knight, Color.WHITE);
             game.putPiece(loc, knight.getType(), knight.getColor());
-            game.putPiece(Location.fromCoordinates(7,6), PieceType.Knight, Color.BLACK);
-            game.putPiece(Location.fromCoordinates(7,2), PieceType.Knight, Color.BLACK);
+            game.putPiece(Location.fromCoordinates(7, 6), PieceType.Knight, Color.BLACK);
+            game.putPiece(Location.fromCoordinates(7, 2), PieceType.Knight, Color.BLACK);
 
             Set<Location> expected = Set.of(
                     Location.fromCoordinates(7, 2), // g2
                     Location.fromCoordinates(6, 3), // f3
                     Location.fromCoordinates(6, 5), // f5
-                    Location.fromCoordinates(7, 6)  // g6
-            );
+                    Location.fromCoordinates(7, 6) // g6
+                    );
             ArrayList<Move> moves = game.computeMoves(loc);
 
             Set<Location> actualMoves = createActualMoves(moves);
@@ -143,18 +139,18 @@ class GameTest {
         }
 
         @Test
-        void TeamInWay () {
+        void teamInWay() {
             Game game = new Game();
             Location loc = Location.fromString("h4");
             Piece knight = new Piece(PieceType.Knight, Color.WHITE);
             game.putPiece(loc, knight.getType(), knight.getColor());
-            game.putPiece(Location.fromCoordinates(7,6), PieceType.Knight, Color.WHITE);
-            game.putPiece(Location.fromCoordinates(7,2), PieceType.Knight, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(7, 6), PieceType.Knight, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(7, 2), PieceType.Knight, Color.WHITE);
 
             Set<Location> expected = Set.of(
                     Location.fromCoordinates(6, 3), // f3
                     Location.fromCoordinates(6, 5) // f5
-            );
+                    );
             ArrayList<Move> moves = game.computeMoves(loc);
 
             Set<Location> actualMoves = createActualMoves(moves);

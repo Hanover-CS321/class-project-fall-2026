@@ -87,7 +87,6 @@ public final class Location {
         }
     }
 
-
     public Optional<Location> shift(Shift shift) {
         int newX = col() + shift.x;
         int newY = row() + shift.y;

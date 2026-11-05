@@ -66,7 +66,6 @@ public class Game {
             PieceType.Rook
         };
 
-
         for (int col = 1; col <= 8; col++) {
             putPiece(Location.fromCoordinates(col, 1), backRow[col - 1], Color.WHITE);
 
@@ -91,7 +90,7 @@ public class Game {
     }
 
     private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {
-        //all 8 possibilities
+        // all 8 possibilities
         ArrayList<Move> validMoves = new ArrayList<>();
         List<Location.Shift> knightShifts = List.of(
                 new Location.Shift(2, 1),
@@ -101,8 +100,7 @@ public class Game {
                 new Location.Shift(1, 2),
                 new Location.Shift(1, -2),
                 new Location.Shift(-1, 2),
-                new Location.Shift(-1, -2)
-        );
+                new Location.Shift(-1, -2));
         List<Location> valid = location.getValidDestinations(knightShifts);
         for (Location l : valid) {
             if (getPiece(l) == null || getPiece(l).getColor() != piece.getColor()) {
