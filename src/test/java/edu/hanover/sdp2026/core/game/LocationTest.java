@@ -43,4 +43,12 @@ class LocationTest {
         Optional<Location> location = Location.fromCoordinates(1, 1).shift(new Location.Shift(-1, 0));
         assertTrue(location.isEmpty());
     }
+
+    @Test
+    void testShiftAdd() {
+        Location.Shift shift1 = new Location.Shift(2, 3);
+        Location.Shift shift2 = new Location.Shift(4, 5);
+
+        assertEquals(new Location.Shift(6, 8), shift1.add(shift2));
+    }
 }

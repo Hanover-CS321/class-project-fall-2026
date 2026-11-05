@@ -99,7 +99,11 @@ public final class Location {
         return Optional.empty();
     }
 
-    public record Shift(int x, int y) {}
+    public record Shift(int x, int y) {
+        public Shift add(Shift shift) {
+            return new Shift(this.x + shift.x(), this.y + shift.y());
+        }
+    }
 
     public List<Location> getValidDestinations(List<Location.Shift> shifts) {
         return shifts.stream()
