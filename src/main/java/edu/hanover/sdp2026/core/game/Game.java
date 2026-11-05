@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Game {
     private Map<Location, Piece> board = new HashMap<>();
@@ -95,11 +96,10 @@ public class Game {
                 new Location.Shift(0, -1));
 
         for (Location.Shift shift : rookShifts) {
-            Location current = location;
-            List<Location> valid = current.getValidDestinations(List.of(shift));
+            Optional<Location> currentOptional = location.shift(shift);
 
-            while (!valid.isEmpty()) {
-                Location destination = valid.get(0);
+            while (currentOptional.isPresent()) {
+                Location destination = currentOptional.get();
                 Piece occupant = getPiece(destination);
 
                 if (occupant == null || occupant.getColor() != piece.getColor()) {
@@ -110,8 +110,7 @@ public class Game {
                     break;
                 }
 
-                current = destination;
-                valid = current.getValidDestinations(List.of(shift));
+                currentOptional = destination.shift(shift);
             }
         }
 
