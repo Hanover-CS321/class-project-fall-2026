@@ -86,43 +86,36 @@ public class Game {
     }
 
     private ArrayList<Move> computeRookMoves(Location location, Piece piece) {
-        ArrayList<Move> moves = new ArrayList<>();
+        ArrayList<Move> validMoves = new ArrayList<>();
 
-        int[][] directions = {
-            {1, 0},
-            {-1, 0},
-            {0, 1},
-            {0, -1}
-        };
+        List<Location.Shift> rookShifts = List.of(
+                new Location.Shift(1, 0),
+                new Location.Shift(-1, 0),
+                new Location.Shift(0, 1),
+                new Location.Shift(0, -1));
 
-        for (int[] direction : directions) {
-            Location.Shift shift = new Location.Shift(direction[0], direction[1]);
+        for (Location.Shift shift : rookShifts) {
             Location current = location;
+            List<Location> valid = current.getValidDestinations(List.of(shift));
 
-            int col = current.col() + direction[0];
-            int row = current.row() + direction[1];
-
-            while (col >= 1 && col <= 8 && row >= 1 && row <= 8) {
-                Location destination = current.add(shift);
+            while (!valid.isEmpty()) {
+                Location destination = valid.get(0);
                 Piece occupant = getPiece(destination);
 
-                if (occupant == null) {
-                    moves.add(new Move(piece, location, destination));
-                } else {
-                    if (occupant.getColor() != piece.getColor()) {
-                        moves.add(new Move(piece, location, destination));
-                    }
+                if (occupant == null || occupant.getColor() != piece.getColor()) {
+                    validMoves.add(new Move(piece, location, destination));
+                }
 
+                if (occupant != null) {
                     break;
                 }
 
                 current = destination;
-                col += direction[0];
-                row += direction[1];
+                valid = current.getValidDestinations(List.of(shift));
             }
         }
 
-        return moves;
+        return validMoves;
     }
 
     private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {
