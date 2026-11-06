@@ -83,7 +83,31 @@ public class Game {
     }
 
     private ArrayList<Move> computePawnMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+        ArrayList<Move> moves = new ArrayList<Move>();
+
+        Location.Shift rowChange = new Location.Shift(0, piece.getColor() == Color.WHITE ? 1 : -1);
+
+        // capture logic
+        location
+                .getValidDestinations(
+                        List.of(rowChange.add(new Location.Shift(-1, 0)), rowChange.add(new Location.Shift(1, 0))))
+                .stream()
+                .filter(l -> locationOccupiedByOpponentOf(piece, l))
+                .map(l -> new Move(piece, location, l))
+                .forEach(moves::add);
+
+        // forward one space logic
+        Optional<Location> forwardSpaceCheck = location.shift(rowChange).filter(this::locationNotOccupied);
+        forwardSpaceCheck.ifPresent(l -> moves.add(new Move(piece, location, l)));
+
+        // forward two spaces logic
+        forwardSpaceCheck
+                .filter(next -> !piece.hasMoved())
+                .flatMap(next -> location.shift(rowChange.add(rowChange)))
+                .filter(this::locationNotOccupied)
+                .ifPresent(next -> moves.add(new Move(piece, location, next)));
+
+        return moves;
     }
 
     private ArrayList<Move> computeRookMoves(Location location, Piece piece) {
@@ -152,5 +176,19 @@ public class Game {
 
     private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
         throw new RuntimeException("not implemented yet");
+    }
+
+    private boolean locationNotOccupied(Location location) {
+        return getPiece(location) == null;
+    }
+
+    private boolean locationOccupiedByAllyOf(Piece piece, Location location) {
+        Piece otherPiece = getPiece(location);
+        return otherPiece != null && otherPiece.getColor() == piece.getColor();
+    }
+
+    private boolean locationOccupiedByOpponentOf(Piece piece, Location location) {
+        Piece otherPiece = getPiece(location);
+        return otherPiece != null && otherPiece.getColor() != piece.getColor();
     }
 }
