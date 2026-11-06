@@ -123,6 +123,63 @@ public class Game {
     }
 
     private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+        ArrayList<Move> validMoves = new ArrayList<>();
+        List<Location.Shift> kingShifts = List.of(
+                new Location.Shift(1, 1),
+                new Location.Shift(1, -1),
+                new Location.Shift(1, 0),
+                new Location.Shift(-1, 1),
+                new Location.Shift(-1, -1),
+                new Location.Shift(-1, 0),
+                new Location.Shift(0, 1),
+                new Location.Shift(0, -1));
+        List<Location> valid = location.getValidDestinations(kingShifts);
+
+        for (Location l : valid) {
+            if (getPiece(l) == null || getPiece(l).getColor() != piece.getColor()) {
+                validMoves.add(new Move(piece, location, l));
+            }
+        }
+        // king always on file e if unmoved
+        if (!piece.hasMoved()) { // will be at e1 for white
+            if (piece.getColor() == Color.WHITE) { // get white King Castle
+                int row = 1;
+                addCastles(location, piece, validMoves, row);
+            } else { // get black king castle, will be at e8
+                int row = 8;
+                addCastles(location, piece, validMoves, row);
+            }
+        }
+        return validMoves;
+    }
+
+    private void addCastles(Location location, Piece piece, ArrayList<Move> validMoves, int row) {
+        Location qRook = Location.fromCoordinates(1, row); // confirm queen side rook and hasn't moved
+        if (isUnMovedRook(qRook)) {
+            Location loc2 = Location.fromCoordinates(2, row); // no piece
+            Location loc3 = Location.fromCoordinates(3, row); // no piece, cant figure out shifts
+            Location loc4 = Location.fromCoordinates(4, row); // no piece
+            if (getPiece(loc2) == null && getPiece(loc3) == null && getPiece(loc4) == null) {
+                validMoves.add(new Move(piece, location, loc3));
+            }
+        } // getPiece can't take an optional
+
+        Location kRook = Location.fromCoordinates(8, row); // confirm king side rook and hasn't moved
+        if (isUnMovedRook(kRook)) {
+            Location kloc2 = Location.fromCoordinates(6, row); // no piece
+            Location kloc3 = Location.fromCoordinates(7, row); // no piece
+            if (getPiece(kloc2) == null && getPiece(kloc3) == null) {
+                validMoves.add(new Move(piece, location, kloc3));
+            }
+        }
+    }
+
+    private boolean isUnMovedRook(Location rookMaybe) {
+        if (getPiece(rookMaybe) != null) {
+            return getPiece(rookMaybe).getType() == PieceType.Rook
+                    && !getPiece(rookMaybe).hasMoved();
+        } else {
+            return false;
+        }
     }
 }
