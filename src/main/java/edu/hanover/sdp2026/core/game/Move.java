@@ -5,10 +5,10 @@ public class Move {
     private final Location from;
     private final Location to;
 
-    Move(Piece p, Location loc1, Location loc2) {
-        this.piece = p;
-        from = loc1;
-        to = loc2;
+    Move(Piece piece, Location from, Location to) {
+        this.piece = piece;
+        this.from = from;
+        this.to = to;
     }
 
     public String moveAsString() {
