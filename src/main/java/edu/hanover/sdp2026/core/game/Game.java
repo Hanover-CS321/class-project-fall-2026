@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Game {
     private Map<Location, Piece> board = new HashMap<>();
@@ -82,7 +83,37 @@ public class Game {
     }
 
     private ArrayList<Move> computePawnMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+        ArrayList<Move> moves = new ArrayList<Move>();
+
+        int y = piece.getColor() == Color.WHITE ? 1 : -1;
+        Location.Shift rowChange = new Location.Shift(0, y);
+
+        // capture logic
+        location
+                .getValidDestinations(
+                        List.of(rowChange.add(new Location.Shift(-1, 0)), rowChange.add(new Location.Shift(1, 0))))
+                .stream()
+                .filter(l -> locationOccupiedByOpponentOf(piece, l))
+                .map(l -> new Move(piece, location, l))
+                .forEach(moves::add);
+
+        // forward one space logic
+        Optional<Location> forwardSpaceCheck = location.shift(rowChange);
+        boolean canMoveOneSpaceForward = false;
+        if (forwardSpaceCheck.isPresent() && locationNotOccupied(forwardSpaceCheck.get())) {
+            moves.add(new Move(piece, location, forwardSpaceCheck.get()));
+            canMoveOneSpaceForward = true;
+        }
+
+        // forward two spaces logic
+        if (!piece.hasMoved() && canMoveOneSpaceForward) {
+            Optional<Location> doubleForwardSpaceCheck = location.shift(rowChange.add(rowChange));
+            if (doubleForwardSpaceCheck.isPresent() && locationNotOccupied(doubleForwardSpaceCheck.get())) {
+                moves.add(new Move(piece, location, doubleForwardSpaceCheck.get()));
+            }
+        }
+
+        return moves;
     }
 
     private ArrayList<Move> computeRookMoves(Location location, Piece piece) {
@@ -124,5 +155,19 @@ public class Game {
 
     private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
         throw new RuntimeException("not implemented yet");
+    }
+
+    private boolean locationNotOccupied(Location location) {
+        return getPiece(location) == null;
+    }
+
+    private boolean locationOccupiedByAllyOf(Piece piece, Location location) {
+        Piece otherPiece = getPiece(location);
+        return otherPiece != null && otherPiece.getColor() == piece.getColor();
+    }
+
+    private boolean locationOccupiedByOpponentOf(Piece piece, Location location) {
+        Piece otherPiece = getPiece(location);
+        return otherPiece != null && otherPiece.getColor() != piece.getColor();
     }
 }
