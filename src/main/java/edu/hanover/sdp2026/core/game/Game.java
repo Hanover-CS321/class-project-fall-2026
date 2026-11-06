@@ -175,7 +175,73 @@ public class Game {
     }
 
     private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+        ArrayList<Move> validMoves = new ArrayList<>();
+        List<Location.Shift> allShifts = new ArrayList<>();
+
+        List<Location.Shift> kingShifts = List.of(
+                new Location.Shift(1, 1),
+                new Location.Shift(1, -1),
+                new Location.Shift(1, 0),
+                new Location.Shift(-1, 1),
+                new Location.Shift(-1, -1),
+                new Location.Shift(-1, 0),
+                new Location.Shift(0, 1),
+                new Location.Shift(0, -1));
+
+        List<Location.Shift> castleShifts = addCastles(location, piece);
+
+        allShifts.addAll(castleShifts);
+        allShifts.addAll(kingShifts);
+
+        location.getValidDestinations(allShifts).stream()
+                .filter(l -> !locationOccupiedByAllyOf(piece, l))
+                .map(l -> new Move(piece, location, l))
+                .forEach(validMoves::add);
+
+        return validMoves;
+    }
+
+    private List<Location.Shift> addCastles(Location location, Piece piece) {
+        if (piece.hasMoved()) {
+            return List.of();
+        }
+        List<Location.Shift> kingShifts = new ArrayList<>();
+        int row = piece.getColor() == Color.WHITE ? 1 : 8;
+
+        // confirm queen side rook and hasn't moved and path is clear
+        Location qRook = Location.fromCoordinates(1, row);
+        if (isUnMovedRook(qRook)) {
+            if (pathClear(2, 3, row)) {
+                kingShifts.add(new Location.Shift(-2, 0));
+            }
+        }
+
+        // confirm king side rook and hasn't moved and path is clear
+        Location kRook = Location.fromCoordinates(8, row);
+        if (isUnMovedRook(kRook)) {
+            if (pathClear(6, 2, row)) {
+                kingShifts.add(new Location.Shift(2, 0));
+            }
+        }
+        return kingShifts;
+    }
+
+    private boolean pathClear(int xStart, int toCheck, int row) {
+        for (int i = 0; i < toCheck; i++) {
+            if (!locationNotOccupied(Location.fromCoordinates(xStart + i, row))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isUnMovedRook(Location rookMaybe) {
+        if (getPiece(rookMaybe) != null) {
+            return getPiece(rookMaybe).getType() == PieceType.Rook
+                    && !getPiece(rookMaybe).hasMoved();
+        } else {
+            return false;
+        }
     }
 
     private boolean locationNotOccupied(Location location) {
