@@ -3,17 +3,37 @@ package edu.hanover.sdp2026.tui;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.screen.Screen;
 import edu.hanover.sdp2026.core.Interactor;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 
 class TUIMainTest {
     @Test
-    void testStartCallsInteractorStart() {
-        TUIMain main = new TUIMain();
-        Interactor interactor = mock(Interactor.class);
+    void startDrawsTitleAndExitsOnQ() throws Exception {
+        Screen screen = mock(Screen.class);
+        TextGraphics graphics = mock(TextGraphics.class, RETURNS_SELF);
+        when(screen.newTextGraphics()).thenReturn(graphics);
+        when(screen.readInput()).thenReturn(new KeyStroke('q', false, false));
 
-        main.setInteractor(interactor);
-        main.start();
-        verify(interactor, times(1)).start();
+        // Make sure close calls stopScreen, so implementation can use either
+        doAnswer(invocation -> {
+                    screen.stopScreen();
+                    return null;
+                })
+                .when(screen)
+                .close();
+
+        TUIMain tui = new TUIMain(screen);
+        tui.setInteractor(mock(Interactor.class));
+        tui.start();
+
+        InOrder order = inOrder(screen);
+        order.verify(screen).startScreen();
+        order.verify(screen).refresh();
+        order.verify(screen).stopScreen();
+        verify(graphics).putString(anyInt(), anyInt(), eq("Chess"));
     }
 }
