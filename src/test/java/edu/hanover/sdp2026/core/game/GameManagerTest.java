@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.hanover.sdp2026.core.GameManager;
 import edu.hanover.sdp2026.core.Presenter;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class GameManagerTest {
@@ -15,6 +16,11 @@ class GameManagerTest {
         @Override
         public void start() {
             startCalls++;
+        }
+
+        @Override
+        public void showPossibleMoves(Location selectedLocatiom, List<Move> possibleMoves) {
+            // These tests only check startup behavior.
         }
     }
 
