@@ -16,12 +16,12 @@ repositories {
 }
 
 dependencies {
+    implementation("com.googlecode.lanterna:lanterna:3.1.5")
     testImplementation(platform("org.junit:junit-bom:6.1.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
     errorprone("com.google.errorprone:error_prone_core:2.51.0")
 }
 
