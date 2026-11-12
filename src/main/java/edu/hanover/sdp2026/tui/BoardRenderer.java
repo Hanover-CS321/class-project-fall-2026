@@ -5,8 +5,12 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import edu.hanover.sdp2026.core.game.Color;
 import edu.hanover.sdp2026.core.game.Location;
+import edu.hanover.sdp2026.core.game.Move;
 import edu.hanover.sdp2026.core.game.Piece;
 import edu.hanover.sdp2026.core.game.PieceType;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class BoardRenderer {
     private static final TextColor LIGHT_SQUARE = TextColor.Factory.fromString("#f0d9b5"); // cream
@@ -16,10 +20,27 @@ public class BoardRenderer {
     private static final TextColor SELECTED = TextColor.Factory.fromString("#f6f669"); // yellow
     private static final TextColor LEGAL_MOVE = TextColor.Factory.fromString("#6b8e23"); // olive
 
+    private Location selectedLocation;
+    private final Set<Location> possibleDestinations = new HashSet<>();
+
     void drawBoard(TextGraphics tg, BoardGeometry geometry) {
         drawLabels(tg, geometry);
         clearBoard(tg, geometry);
         drawPieces(tg, geometry);
+    }
+
+    void drawBoard(TextGraphics tg, BoardGeometry geometry, Location selectedLocation, List<Move> possibleMoves) {
+        this.selectedLocation = selectedLocation;
+
+        possibleDestinations.clear();
+
+        if (selectedLocation != null) {
+            for (Move move : possibleMoves) {
+                possibleDestinations.add(move.getTo());
+            }
+        }
+
+        drawBoard(tg, geometry);
     }
 
     void clearBoard(TextGraphics tg, BoardGeometry geometry) {
@@ -69,6 +90,10 @@ public class BoardRenderer {
     }
 
     private TextColor getSquareColor(Location loc) {
+        if (loc.equals(selectedLocation)) return SELECTED;
+
+        if (possibleDestinations.contains(loc)) return LEGAL_MOVE;
+
         return (loc.col() + loc.row()) % 2 == 0 ? DARK_SQUARE : LIGHT_SQUARE;
     }
 

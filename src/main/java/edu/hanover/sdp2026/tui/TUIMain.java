@@ -6,7 +6,10 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import edu.hanover.sdp2026.core.Interactor;
 import edu.hanover.sdp2026.core.Presenter;
+import edu.hanover.sdp2026.core.game.Location;
+import edu.hanover.sdp2026.core.game.Move;
 import java.io.IOException;
+import java.util.List;
 
 public class TUIMain implements Presenter {
     private final Screen screen;
@@ -49,8 +52,21 @@ public class TUIMain implements Presenter {
     private void initialDraw() throws IOException {
         TextGraphics tg = screen.newTextGraphics();
         tg.putString(0, 0, "Chess");
-        boardRenderer.drawBoard(tg, geometry);
+        boardRenderer.drawBoard(tg, geometry, Location.fromString("d1"), List.of());
 
         screen.refresh();
+    }
+
+    @Override
+    public void showPossibleMoves(Location selectedLocation, List<Move> possibleMoves) {
+        TextGraphics tg = screen.newTextGraphics();
+
+        boardRenderer.drawBoard(tg, geometry, selectedLocation, possibleMoves);
+
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
