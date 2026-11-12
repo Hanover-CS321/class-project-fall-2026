@@ -1,6 +1,5 @@
 package edu.hanover.sdp2026.tui;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -15,6 +14,8 @@ class TUIMainTest {
     void startDrawsTitleAndExitsOnQ() throws Exception {
         Screen screen = mock(Screen.class);
         TextGraphics graphics = mock(TextGraphics.class, RETURNS_SELF);
+        Interactor interactor = mock(Interactor.class);
+
         when(screen.newTextGraphics()).thenReturn(graphics);
         when(screen.readInput()).thenReturn(new KeyStroke('q', false, false));
 
@@ -27,7 +28,7 @@ class TUIMainTest {
                 .close();
 
         TUIMain tui = new TUIMain(screen);
-        tui.setInteractor(mock(Interactor.class));
+        tui.setInteractor(interactor);
         tui.start();
 
         InOrder order = inOrder(screen);
@@ -35,5 +36,6 @@ class TUIMainTest {
         order.verify(screen).refresh();
         order.verify(screen).stopScreen();
         verify(graphics).putString(anyInt(), anyInt(), eq("Chess"));
+        verifyNoInteractions(interactor);
     }
 }

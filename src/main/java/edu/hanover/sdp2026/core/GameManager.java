@@ -1,19 +1,36 @@
 package edu.hanover.sdp2026.core;
 
+import edu.hanover.sdp2026.core.game.Game;
+import edu.hanover.sdp2026.core.game.Location;
+import edu.hanover.sdp2026.core.game.Move;
 import edu.hanover.sdp2026.core.useraction.ChooseSquareAction;
 import edu.hanover.sdp2026.core.useraction.NewGameAction;
 import edu.hanover.sdp2026.core.useraction.PromotePawnAction;
 import edu.hanover.sdp2026.core.useraction.ResignAction;
 import edu.hanover.sdp2026.core.useraction.UndoAction;
 import edu.hanover.sdp2026.core.useraction.UserAction;
+import java.util.List;
+import java.util.Objects;
 
 public class GameManager implements Interactor {
     Presenter presenter;
+
+    private final Game game;
+    private Location selectedLocation;
+
+    public GameManager() {
+        this(Game.createDefaultGame());
+    }
+
+    public GameManager(Game game) {
+        this.game = Objects.requireNonNull(game);
+    }
 
     public void setPresenter(Presenter presenter) {
         this.presenter = presenter;
     }
 
+    @Override
     public void start() {
         if (presenter == null) {
             throw new IllegalStateException("A presenter must be set before starting.");
@@ -39,7 +56,20 @@ public class GameManager implements Interactor {
     }
 
     private void handleChooseSquare(ChooseSquareAction action) {
-        throw new UnsupportedOperationException("ChooseSquare processing not yet implemented.");
+        if (presenter == null) {
+            throw new IllegalStateException("A presenter must be set before selecting a square.");
+        }
+
+        List<Move> possibleMoves = game.computeMoves(action.location);
+
+        if (possibleMoves == null) {
+            selectedLocation = null;
+            presenter.showPossibleMoves(null, List.of());
+            return;
+        }
+
+        selectedLocation = action.location;
+        presenter.showPossibleMoves(selectedLocation, possibleMoves);
     }
 
     private void handlePromotePawn(PromotePawnAction action) {

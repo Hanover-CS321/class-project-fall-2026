@@ -53,4 +53,42 @@ public class TUIMain implements Presenter {
 
         screen.refresh();
     }
+
+    @Override
+    public void showPossibleMoves(Location selectedLocation, List<Move> possibleMoves) {
+        String message;
+
+        if (selectedLocation == null) {
+            message = "Selection cleared.";
+        } else if (possibleMoves.isEmpty()) {
+            message = "Selected: "
+                + selectedLocation.getStringEquivalent()
+                + " | No possible moves.";
+        } else {
+            String destinations = possibleMoves.stream()
+                .map(move -> move.getTo().getStringEquivalent())
+                .collect(Collectors.joining(", "));
+
+            message = "Selected: "
+                + selectedLocation.getStringEquivalent()
+                + " | Moves: "
+                + destinations;
+        }
+
+        int width = screen.getTerminalSize().getColumns();
+        if (width <= 0) {
+            return;
+        }
+
+        String visibleMessage = message.substring(0, Math.min(message.length(), width));
+        TextGraphics tg = screen.newTextGraphics();
+        tg.putString(0, 1, " ".repeat(width));
+        tg.putString(0, 1, visibleMessage);
+
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
