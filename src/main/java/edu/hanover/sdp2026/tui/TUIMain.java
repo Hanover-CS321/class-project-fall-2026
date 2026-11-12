@@ -6,7 +6,11 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import edu.hanover.sdp2026.core.Interactor;
 import edu.hanover.sdp2026.core.Presenter;
+import edu.hanover.sdp2026.core.game.Location;
+import edu.hanover.sdp2026.core.game.Move;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TUIMain implements Presenter {
     private final Screen screen;
@@ -61,18 +65,13 @@ public class TUIMain implements Presenter {
         if (selectedLocation == null) {
             message = "Selection cleared.";
         } else if (possibleMoves.isEmpty()) {
-            message = "Selected: "
-                + selectedLocation.getStringEquivalent()
-                + " | No possible moves.";
+            message = "Selected: " + selectedLocation.getStringEquivalent() + " | No possible moves.";
         } else {
             String destinations = possibleMoves.stream()
-                .map(move -> move.getTo().getStringEquivalent())
-                .collect(Collectors.joining(", "));
+                    .map(move -> move.getTo().getStringEquivalent())
+                    .collect(Collectors.joining(", "));
 
-            message = "Selected: "
-                + selectedLocation.getStringEquivalent()
-                + " | Moves: "
-                + destinations;
+            message = "Selected: " + selectedLocation.getStringEquivalent() + " | Moves: " + destinations;
         }
 
         int width = screen.getTerminalSize().getColumns();
