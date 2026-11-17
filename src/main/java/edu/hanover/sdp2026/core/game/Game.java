@@ -2,13 +2,16 @@ package edu.hanover.sdp2026.core.game;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class Game {
     private Map<Location, Piece> board = new HashMap<>();
     private Color turn = Color.WHITE;
+    private final Set<Piece> movedPieces = new HashSet<>();
 
     public Game() {}
 
@@ -44,6 +47,16 @@ public class Game {
 
     public void setTurn(Color turn) {
         this.turn = turn;
+    }
+
+    public void setHasMoved(Piece piece, boolean movedState) {
+        if (piece == null) return;
+        if (movedState) movedPieces.add(piece);
+        else movedPieces.remove(piece);
+    }
+
+    public boolean hasMoved(Piece piece) {
+        return movedPieces.contains(piece);
     }
 
     Piece getPiece(Location location) {
@@ -102,7 +115,7 @@ public class Game {
 
         // forward two spaces logic
         forwardSpaceCheck
-                .filter(next -> !piece.hasMoved())
+                .filter(next -> !hasMoved(piece))
                 .flatMap(next -> location.shift(rowChange.add(rowChange)))
                 .filter(this::locationNotOccupied)
                 .ifPresent(next -> moves.add(new Move(piece, location, next)));
@@ -202,7 +215,7 @@ public class Game {
     }
 
     private List<Location.Shift> addCastles(Location location, Piece piece) {
-        if (piece.hasMoved()) {
+        if (hasMoved(piece)) {
             return List.of();
         }
         List<Location.Shift> kingShifts = new ArrayList<>();
@@ -237,8 +250,7 @@ public class Game {
 
     private boolean isUnMovedRook(Location rookMaybe) {
         if (getPiece(rookMaybe) != null) {
-            return getPiece(rookMaybe).getType() == PieceType.Rook
-                    && !getPiece(rookMaybe).hasMoved();
+            return getPiece(rookMaybe).getType() == PieceType.Rook && !hasMoved(getPiece(rookMaybe));
         } else {
             return false;
         }

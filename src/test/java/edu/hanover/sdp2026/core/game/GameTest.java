@@ -71,6 +71,47 @@ class GameTest {
     class ComputeMovesTests {}
 
     @Nested
+    class HasMovedTests {
+
+        @Test
+        void defaultBoardHasNotMoved() {
+            game = Game.createDefaultGame();
+            boolean move = game.hasMoved(game.getPiece(Location.fromCoordinates(2, 2)));
+            boolean move2 = game.hasMoved(game.getPiece(Location.fromCoordinates(2, 1)));
+            assertFalse(move);
+            assertFalse(move2);
+        }
+
+        @Test
+        void setHasMovedTrueWorks() {
+            game = Game.createDefaultGame();
+            Piece pawn = game.getPiece(Location.fromCoordinates(2, 2));
+            game.setHasMoved(pawn, true);
+            Piece horse = game.getPiece(Location.fromCoordinates(2, 1));
+            game.setHasMoved(horse, true);
+
+            assertTrue(game.hasMoved(pawn));
+            assertTrue(game.hasMoved(horse));
+        }
+
+        @Test
+        void setHasMovedFalseWorks() {
+            game = Game.createDefaultGame();
+
+            Piece pawn = game.getPiece(Location.fromCoordinates(2, 2));
+            game.setHasMoved(pawn, true);
+            game.setHasMoved(pawn, false);
+
+            Piece horse = game.getPiece(Location.fromCoordinates(2, 1));
+            game.setHasMoved(horse, true);
+            game.setHasMoved(horse, false);
+
+            assertFalse(game.hasMoved(pawn));
+            assertFalse(game.hasMoved(horse));
+        }
+    }
+
+    @Nested
     class PawnMoveTests {
 
         @Test
@@ -81,7 +122,7 @@ class GameTest {
             game.putPiece(pawnLocation, PieceType.Pawn, Color.WHITE);
 
             Piece pawn = game.getPiece(pawnLocation);
-            pawn.setHasMoved(false);
+            game.setHasMoved(pawn, false);
 
             ArrayList<Move> moves = game.computeMoves(pawnLocation);
 
@@ -99,7 +140,7 @@ class GameTest {
             game.putPiece(pawnLocation, PieceType.Pawn, Color.BLACK);
 
             Piece pawn = game.getPiece(pawnLocation);
-            pawn.setHasMoved(false);
+            game.setHasMoved(pawn, false);
 
             ArrayList<Move> moves = game.computeMoves(pawnLocation);
 
@@ -116,7 +157,7 @@ class GameTest {
             game.putPiece(pawnLocation, PieceType.Pawn, Color.WHITE);
 
             Piece pawn = game.getPiece(pawnLocation);
-            pawn.setHasMoved(true);
+            game.setHasMoved(pawn, true);
 
             ArrayList<Move> moves = game.computeMoves(pawnLocation);
 
@@ -133,7 +174,7 @@ class GameTest {
             game.putPiece(pawnLocation, PieceType.Pawn, Color.BLACK);
 
             Piece pawn = game.getPiece(pawnLocation);
-            pawn.setHasMoved(true);
+            game.setHasMoved(pawn, true);
 
             ArrayList<Move> moves = game.computeMoves(pawnLocation);
 
