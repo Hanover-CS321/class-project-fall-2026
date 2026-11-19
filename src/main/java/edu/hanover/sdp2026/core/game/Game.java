@@ -1,17 +1,12 @@
 package edu.hanover.sdp2026.core.game;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public class Game {
-    private Map<Location, Piece> board = new HashMap<>();
+    private final Board board = new Board();
     private Color turn = Color.WHITE;
-    private final Set<Piece> movedPieces = new HashSet<>();
 
     public Game() {}
 
@@ -22,7 +17,7 @@ public class Game {
     }
 
     public ArrayList<Move> computeMoves(Location location) {
-        Piece piece = getPiece(location);
+        Piece piece = board.getPiece(location);
 
         if (piece == null) return null;
 
@@ -39,7 +34,9 @@ public class Game {
         };
     }
 
-    public void makeMove(Move move) {}
+    public void makeMove(Move move) {
+
+    }
 
     public Color getTurn() {
         return turn;
@@ -49,23 +46,16 @@ public class Game {
         this.turn = turn;
     }
 
-    public void setHasMoved(Piece piece, boolean movedState) {
-        if (piece == null) return;
-        if (movedState) movedPieces.add(piece);
-        else movedPieces.remove(piece);
-    }
-
-    public boolean hasMoved(Piece piece) {
-        return movedPieces.contains(piece);
-    }
-
     Piece getPiece(Location location) {
-        return board.getOrDefault(location, null);
+        return board.getPiece(location);
     }
 
     void putPiece(Location location, PieceType type, Color color) {
-        if (getPiece(location) != null) throw new RuntimeException("space is occupied");
-        board.put(location, new Piece(type, color));
+        board.putPiece(location, type, color);
+    }
+
+    Board getBoard() {
+        return board;
     }
 
     private void setupInitialBoard() {
@@ -81,13 +71,13 @@ public class Game {
         };
 
         for (int col = 1; col <= 8; col++) {
-            putPiece(Location.fromCoordinates(col, 1), backRow[col - 1], Color.WHITE);
+            board.putPiece(Location.fromCoordinates(col, 1), backRow[col - 1], Color.WHITE);
 
-            putPiece(Location.fromCoordinates(col, 2), PieceType.Pawn, Color.WHITE);
+            board.putPiece(Location.fromCoordinates(col, 2), PieceType.Pawn, Color.WHITE);
 
-            putPiece(Location.fromCoordinates(col, 7), PieceType.Pawn, Color.BLACK);
+            board.putPiece(Location.fromCoordinates(col, 7), PieceType.Pawn, Color.BLACK);
 
-            putPiece(Location.fromCoordinates(col, 8), backRow[col - 1], Color.BLACK);
+            board.putPiece(Location.fromCoordinates(col, 8), backRow[col - 1], Color.BLACK);
         }
     }
 
@@ -115,7 +105,7 @@ public class Game {
 
         // forward two spaces logic
         forwardSpaceCheck
-                .filter(next -> !hasMoved(piece))
+                .filter(next -> !board.hasMoved(piece))
                 .flatMap(next -> location.shift(rowChange.add(rowChange)))
                 .filter(this::locationNotOccupied)
                 .ifPresent(next -> moves.add(new Move(piece, location, next)));
@@ -144,7 +134,7 @@ public class Game {
 
             while (currentOptional.isPresent()) {
                 Location destination = currentOptional.get();
-                Piece occupant = getPiece(destination);
+                Piece occupant = board.getPiece(destination);
 
                 if (occupant == null || occupant.getColor() != piece.getColor()) {
                     validMoves.add(new Move(piece, location, destination));
@@ -173,7 +163,7 @@ public class Game {
                 new Location.Shift(-1, -2));
         List<Location> valid = location.getValidDestinations(knightShifts);
         for (Location l : valid) {
-            if (getPiece(l) == null || getPiece(l).getColor() != piece.getColor()) {
+            if (board.getPiece(l) == null || board.getPiece(l).getColor() != piece.getColor()) {
                 validMoves.add(new Move(piece, location, l));
             }
         }
@@ -229,7 +219,7 @@ public class Game {
     }
 
     private List<Location.Shift> addCastles(Location location, Piece piece) {
-        if (hasMoved(piece)) {
+        if (board.hasMoved(piece)) {
             return List.of();
         }
         List<Location.Shift> kingShifts = new ArrayList<>();
@@ -264,23 +254,23 @@ public class Game {
 
     private boolean isUnMovedRook(Location rookMaybe) {
         if (getPiece(rookMaybe) != null) {
-            return getPiece(rookMaybe).getType() == PieceType.Rook && !hasMoved(getPiece(rookMaybe));
+            return getPiece(rookMaybe).getType() == PieceType.Rook && !board.hasMoved(getPiece(rookMaybe));
         } else {
             return false;
         }
     }
 
     private boolean locationNotOccupied(Location location) {
-        return getPiece(location) == null;
+        return board.getPiece(location) == null;
     }
 
     private boolean locationOccupiedByAllyOf(Piece piece, Location location) {
-        Piece otherPiece = getPiece(location);
+        Piece otherPiece = board.getPiece(location);
         return otherPiece != null && otherPiece.getColor() == piece.getColor();
     }
 
     private boolean locationOccupiedByOpponentOf(Piece piece, Location location) {
-        Piece otherPiece = getPiece(location);
+        Piece otherPiece = board.getPiece(location);
         return otherPiece != null && otherPiece.getColor() != piece.getColor();
     }
 }
