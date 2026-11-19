@@ -39,6 +39,16 @@ class GameTest {
         }
 
         @Test
+        void putPieceThrowsWhenSquareIsOccupied() {
+            game = new Game();
+
+            Location location = Location.fromCoordinates(1, 1);
+            game.putPiece(location, PieceType.King, Color.WHITE);
+
+            assertThrows(RuntimeException.class, () -> game.putPiece(location, PieceType.Rook, Color.BLACK));
+        }
+
+        @Test
         void createDefaultGameSetsUpBoardCorrectlyAndWhiteTurn() {
             game = Game.createDefaultGame();
 
@@ -68,7 +78,25 @@ class GameTest {
     }
 
     @Nested
-    class ComputeMovesTests {}
+    class ComputeMovesTests {
+
+        @Test
+        void emptySquareReturnsNull() {
+            Game game = new Game();
+
+            assertNull(game.computeMoves(Location.fromString("d4")));
+        }
+
+        @Test
+        void pieceCannotBeSelectedOnOpponentsTurn() {
+            Game game = new Game();
+            Location loc = Location.fromString("d4");
+            game.putPiece(loc, PieceType.Rook, Color.WHITE);
+            game.setTurn(Color.BLACK);
+
+            assertNull(game.computeMoves(loc));
+        }
+    }
 
     @Nested
     class HasMovedTests {
@@ -303,10 +331,140 @@ class GameTest {
             assertMoveExists(moves, Location.fromCoordinates(8, 4));
             assertMoveExists(moves, Location.fromCoordinates(7, 3));
         }
+
+        @Test
+        void whitePawnOnFinalRankHasNoMoves() {
+            game = new Game();
+
+            Location pawnLocation = Location.fromCoordinates(4, 8);
+            game.putPiece(pawnLocation, PieceType.Pawn, Color.WHITE);
+
+            ArrayList<Move> moves = game.computeMoves(pawnLocation);
+
+            assertNotNull(moves);
+            assertTrue(moves.isEmpty());
+        }
     }
 
     @Nested
-    class RookMoveTests {}
+    class RookMoveTests {
+
+        @Test
+        void rookInMiddleOfEmptyBoardMovesHorizontallyAndVertically() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Rook, Color.WHITE);
+
+            assertMoves(game, "d4", "a4", "b4", "c4", "e4", "f4", "g4", "h4", "d1", "d2", "d3", "d5", "d6", "d7", "d8");
+        }
+
+        @Test
+        void rookInCornerDoesNotMoveOutsideBoard() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("a1"), PieceType.Rook, Color.WHITE);
+
+            assertMoves(game, "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "a2", "a3", "a4", "a5", "a6", "a7", "a8");
+        }
+
+        @Test
+        void rookInOppositeCornerDoesNotMoveOutsideBoard() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("h8"), PieceType.Rook, Color.WHITE);
+
+            assertMoves(game, "h8", "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h1", "h2", "h3", "h4", "h5", "h6", "h7");
+        }
+
+        @Test
+        void friendlyPieceBlocksRookAndCannotBeCaptured() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromString("d6"), PieceType.Pawn, Color.WHITE);
+
+            assertMoves(game, "d4", "a4", "b4", "c4", "e4", "f4", "g4", "h4", "d1", "d2", "d3", "d5");
+        }
+
+        @Test
+        void enemyPieceCanBeCapturedButBlocksFurtherMoves() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromString("f4"), PieceType.Pawn, Color.BLACK);
+
+            assertMoves(game, "d4", "a4", "b4", "c4", "e4", "f4", "d1", "d2", "d3", "d5", "d6", "d7", "d8");
+        }
+
+        @Test
+        void rookCannotJumpOverFriendlyPieceToCaptureEnemy() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromString("d5"), PieceType.Pawn, Color.WHITE);
+            game.putPiece(Location.fromString("d7"), PieceType.Pawn, Color.BLACK);
+
+            assertMoves(game, "d4", "a4", "b4", "c4", "e4", "f4", "g4", "h4", "d1", "d2", "d3");
+        }
+
+        @Test
+        void rookIsBlockedOnBothSidesOfItsRank() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromString("b4"), PieceType.Pawn, Color.BLACK);
+            game.putPiece(Location.fromString("f4"), PieceType.Pawn, Color.BLACK);
+
+            assertMoves(game, "d4", "b4", "c4", "e4", "f4", "d1", "d2", "d3", "d5", "d6", "d7", "d8");
+        }
+
+        @Test
+        void rookCanCaptureOnBoardEdge() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromString("h4"), PieceType.Pawn, Color.BLACK);
+
+            assertMoves(game, "d4", "a4", "b4", "c4", "e4", "f4", "g4", "h4", "d1", "d2", "d3", "d5", "d6", "d7", "d8");
+        }
+
+        @Test
+        void rookSurroundedByFriendlyPiecesHasNoMoves() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Rook, Color.WHITE);
+
+            for (String square : new String[] {"c4", "e4", "d3", "d5"}) {
+                game.putPiece(Location.fromString(square), PieceType.Pawn, Color.WHITE);
+            }
+
+            ArrayList<Move> moves = game.computeMoves(Location.fromString("d4"));
+
+            assertNotNull(moves);
+            assertTrue(moves.isEmpty());
+        }
+
+        @Test
+        void blackRookCanCaptureWhitePieceOnBlackTurn() {
+            Game game = new Game();
+            game.setTurn(Color.BLACK);
+            game.putPiece(Location.fromString("d4"), PieceType.Rook, Color.BLACK);
+            game.putPiece(Location.fromString("b4"), PieceType.Pawn, Color.WHITE);
+
+            assertMoves(game, "d4", "b4", "c4", "e4", "f4", "g4", "h4", "d1", "d2", "d3", "d5", "d6", "d7", "d8");
+        }
+
+        @Test
+        void blackRookIsBlockedByBlackPiece() {
+            Game game = new Game();
+            game.setTurn(Color.BLACK);
+            game.putPiece(Location.fromString("d4"), PieceType.Rook, Color.BLACK);
+            game.putPiece(Location.fromString("d6"), PieceType.Pawn, Color.BLACK);
+
+            assertMoves(game, "d4", "a4", "b4", "c4", "e4", "f4", "g4", "h4", "d1", "d2", "d3", "d5");
+        }
+
+        @Test
+        void rookOnDefaultBoardIsBlockedByItsOwnPieces() {
+            Game game = Game.createDefaultGame();
+
+            ArrayList<Move> moves = game.computeMoves(Location.fromString("a1"));
+
+            assertNotNull(moves);
+            assertTrue(moves.isEmpty());
+        }
+    }
 
     @Nested
     class KnightMoveTests {
@@ -392,10 +550,242 @@ class GameTest {
     }
 
     @Nested
-    class BishopMoveTests {}
+    class BishopMoveTests {
+
+        @Test
+        void bishopInMiddleOfEmptyBoardMovesDiagonally() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Bishop, Color.WHITE);
+
+            assertMoves(game, "d4", "a1", "b2", "c3", "e5", "f6", "g7", "h8", "a7", "b6", "c5", "e3", "f2", "g1");
+        }
+
+        @Test
+        void bishopInCornerDoesNotMoveOutsideBoard() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("a1"), PieceType.Bishop, Color.WHITE);
+
+            assertMoves(game, "a1", "b2", "c3", "d4", "e5", "f6", "g7", "h8");
+        }
+
+        @Test
+        void friendlyPieceBlocksBishopAndCannotBeCaptured() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Bishop, Color.WHITE);
+            game.putPiece(Location.fromString("f6"), PieceType.Pawn, Color.WHITE);
+
+            assertMoves(game, "d4", "e5", "c5", "b6", "a7", "e3", "f2", "g1", "c3", "b2", "a1");
+        }
+
+        @Test
+        void enemyPieceCanBeCapturedButBlocksFurtherMoves() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Bishop, Color.WHITE);
+            game.putPiece(Location.fromString("f6"), PieceType.Pawn, Color.BLACK);
+
+            assertMoves(game, "d4", "e5", "f6", "c5", "b6", "a7", "e3", "f2", "g1", "c3", "b2", "a1");
+        }
+
+        @Test
+        void bishopSurroundedByFriendlyPiecesHasNoMoves() {
+            Game game = new Game();
+            game.putPiece(Location.fromString("d4"), PieceType.Bishop, Color.WHITE);
+
+            for (String square : new String[] {"c3", "c5", "e3", "e5"}) {
+                game.putPiece(Location.fromString(square), PieceType.Pawn, Color.WHITE);
+            }
+
+            ArrayList<Move> moves = game.computeMoves(Location.fromString("d4"));
+
+            assertNotNull(moves);
+            assertTrue(moves.isEmpty());
+        }
+
+        @Test
+        void bishopOnDefaultBoardIsBlockedByItsOwnPieces() {
+            Game game = Game.createDefaultGame();
+
+            ArrayList<Move> moves = game.computeMoves(Location.fromString("c1"));
+
+            assertNotNull(moves);
+            assertTrue(moves.isEmpty());
+        }
+
+        @Test
+        void blackBishopCanCaptureWhitePieceOnBlackTurn() {
+            Game game = new Game();
+            game.setTurn(Color.BLACK);
+            game.putPiece(Location.fromString("d4"), PieceType.Bishop, Color.BLACK);
+            game.putPiece(Location.fromString("b6"), PieceType.Pawn, Color.WHITE);
+
+            assertMoves(game, "d4", "c5", "b6", "e5", "f6", "g7", "h8", "e3", "f2", "g1", "c3", "b2", "a1");
+        }
+    }
 
     @Nested
-    class QueenMoveTests {}
+    class QueenMoveTests {
+        @Test
+        void noMoves() {
+            Game game = Game.createDefaultGame();
+
+            Location loc = Location.fromCoordinates(4, 1); // d1
+            ArrayList<Move> moves = game.computeMoves(loc);
+
+            Set<Location> actualMoves = createActualMoves(moves);
+
+            assertEquals(Collections.emptySet(), actualMoves);
+        }
+
+        @Test
+        void allMovesFromCenter() {
+            Game game = new Game();
+            Location loc = Location.fromString("d4");
+            Piece queen = new Piece(PieceType.Queen, Color.WHITE);
+            game.putPiece(loc, queen.getType(), queen.getColor());
+
+            Set<Location> expected = Set.of(
+                    // Horizontal
+                    Location.fromCoordinates(1, 4), // a4
+                    Location.fromCoordinates(2, 4), // b4
+                    Location.fromCoordinates(3, 4), // c4
+                    Location.fromCoordinates(5, 4), // e4
+                    Location.fromCoordinates(6, 4), // f4
+                    Location.fromCoordinates(7, 4), // g4
+                    Location.fromCoordinates(8, 4), // h4
+
+                    // Vertical
+                    Location.fromCoordinates(4, 1), // d1
+                    Location.fromCoordinates(4, 2), // d2
+                    Location.fromCoordinates(4, 3), // d3
+                    Location.fromCoordinates(4, 5), // d5
+                    Location.fromCoordinates(4, 6), // d6
+                    Location.fromCoordinates(4, 7), // d7
+                    Location.fromCoordinates(4, 8), // d8
+
+                    // Diagonal up-right
+                    Location.fromCoordinates(5, 5), // e5
+                    Location.fromCoordinates(6, 6), // f6
+                    Location.fromCoordinates(7, 7), // g7
+                    Location.fromCoordinates(8, 8), // h8
+
+                    // Diagonal up-left
+                    Location.fromCoordinates(3, 5), // c5
+                    Location.fromCoordinates(2, 6), // b6
+                    Location.fromCoordinates(1, 7), // a7
+
+                    // Diagonal down-right
+                    Location.fromCoordinates(5, 3), // e3
+                    Location.fromCoordinates(6, 2), // f2
+                    Location.fromCoordinates(7, 1), // g1
+
+                    // Diagonal down-left
+                    Location.fromCoordinates(3, 3), // c3
+                    Location.fromCoordinates(2, 2), // b2
+                    Location.fromCoordinates(1, 1) // a1
+                    );
+
+            ArrayList<Move> moves = game.computeMoves(loc);
+            Set<Location> actualMoves = createActualMoves(moves);
+
+            assertEquals(expected, actualMoves);
+        }
+
+        @Test
+        void allMovesFromCorner() {
+            Game game = new Game();
+            Location loc = Location.fromString("h1");
+            Piece queen = new Piece(PieceType.Queen, Color.WHITE);
+            game.putPiece(loc, queen.getType(), queen.getColor());
+
+            Set<Location> expected = Set.of(
+                    // Left
+                    Location.fromCoordinates(1, 1),
+                    Location.fromCoordinates(2, 1),
+                    Location.fromCoordinates(3, 1),
+                    Location.fromCoordinates(4, 1),
+                    Location.fromCoordinates(5, 1),
+                    Location.fromCoordinates(6, 1),
+                    Location.fromCoordinates(7, 1),
+
+                    // Up
+                    Location.fromCoordinates(8, 2),
+                    Location.fromCoordinates(8, 3),
+                    Location.fromCoordinates(8, 4),
+                    Location.fromCoordinates(8, 5),
+                    Location.fromCoordinates(8, 6),
+                    Location.fromCoordinates(8, 7),
+                    Location.fromCoordinates(8, 8),
+
+                    // Diagonal up-left
+                    Location.fromCoordinates(7, 2),
+                    Location.fromCoordinates(6, 3),
+                    Location.fromCoordinates(5, 4),
+                    Location.fromCoordinates(4, 5),
+                    Location.fromCoordinates(3, 6),
+                    Location.fromCoordinates(2, 7),
+                    Location.fromCoordinates(1, 8));
+
+            ArrayList<Move> moves = game.computeMoves(loc);
+            Set<Location> actualMoves = createActualMoves(moves);
+
+            assertEquals(expected, actualMoves);
+        }
+
+        @Test
+        void queenCanCaptureEnemies() {
+            Game game = new Game();
+            Location loc = Location.fromString("d4");
+            Piece queen = new Piece(PieceType.Queen, Color.WHITE);
+            game.putPiece(loc, queen.getType(), queen.getColor());
+
+            game.putPiece(Location.fromCoordinates(4, 6), PieceType.Knight, Color.BLACK); // d6
+            game.putPiece(Location.fromCoordinates(6, 6), PieceType.Bishop, Color.BLACK); // f6
+
+            Set<Location> actualMoves = createActualMoves(game.computeMoves(loc));
+
+            assertTrue(actualMoves.contains(Location.fromCoordinates(4, 6)));
+            assertTrue(actualMoves.contains(Location.fromCoordinates(6, 6)));
+        }
+
+        @Test
+        void queenOnlyThreeCaptureMoves() {
+            Game game = new Game();
+
+            Location loc = Location.fromString("a1");
+            game.putPiece(loc, PieceType.Queen, Color.WHITE);
+
+            game.putPiece(Location.fromString("a2"), PieceType.Pawn, Color.BLACK);
+            game.putPiece(Location.fromString("b1"), PieceType.Pawn, Color.BLACK);
+            game.putPiece(Location.fromString("b2"), PieceType.Pawn, Color.BLACK);
+
+            Set<Location> expected =
+                    Set.of(Location.fromString("a2"), Location.fromString("b1"), Location.fromString("b2"));
+
+            ArrayList<Move> moves = game.computeMoves(loc);
+            Set<Location> actualMoves = createActualMoves(moves);
+
+            assertEquals(expected, actualMoves);
+        }
+
+        @Test
+        void queenCannotCaptureTeam() {
+            Game game = new Game();
+
+            Location loc = Location.fromString("a1");
+            game.putPiece(loc, PieceType.Queen, Color.WHITE);
+
+            game.putPiece(Location.fromString("a2"), PieceType.Pawn, Color.BLACK);
+            game.putPiece(Location.fromString("b1"), PieceType.Pawn, Color.WHITE);
+            game.putPiece(Location.fromString("b2"), PieceType.Pawn, Color.WHITE);
+
+            Set<Location> expected = Set.of(Location.fromString("a2"));
+
+            ArrayList<Move> moves = game.computeMoves(loc);
+            Set<Location> actualMoves = createActualMoves(moves);
+
+            assertEquals(expected, actualMoves);
+        }
+    }
 
     @Nested
     class KingMoveTests {
@@ -599,6 +989,93 @@ class GameTest {
             Set<Location> actualMoves = createActualMoves(moves);
             assertEquals(expected, actualMoves);
         }
+
+        @Test
+        void kingThatHasMovedCannotCastle() {
+            Game game = new Game();
+            Location loc = Location.fromString("e1");
+            game.putPiece(loc, PieceType.King, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(1, 1), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(8, 1), PieceType.Rook, Color.WHITE);
+            game.setHasMoved(game.getPiece(loc), true);
+
+            Set<Location> expected = Set.of(
+                    Location.fromCoordinates(4, 1),
+                    Location.fromCoordinates(6, 1),
+                    Location.fromCoordinates(4, 2),
+                    Location.fromCoordinates(5, 2),
+                    Location.fromCoordinates(6, 2));
+
+            ArrayList<Move> moves = game.computeMoves(loc);
+            Set<Location> actualMoves = createActualMoves(moves);
+            assertEquals(expected, actualMoves);
+        }
+
+        @Test
+        void kingCannotCastleWithRookThatHasMoved() {
+            Game game = new Game();
+            Location loc = Location.fromString("e1");
+            game.putPiece(loc, PieceType.King, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(1, 1), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(8, 1), PieceType.Rook, Color.WHITE);
+            game.setHasMoved(game.getPiece(Location.fromCoordinates(1, 1)), true);
+
+            Set<Location> expected = Set.of(
+                    Location.fromCoordinates(4, 1),
+                    Location.fromCoordinates(6, 1),
+                    Location.fromCoordinates(7, 1), // kingside castle still available
+                    Location.fromCoordinates(4, 2),
+                    Location.fromCoordinates(5, 2),
+                    Location.fromCoordinates(6, 2));
+
+            ArrayList<Move> moves = game.computeMoves(loc);
+            Set<Location> actualMoves = createActualMoves(moves);
+            assertEquals(expected, actualMoves);
+        }
+
+        @Test
+        void kingCannotCastleThroughOccupiedSquare() {
+            Game game = new Game();
+            Location loc = Location.fromString("e1");
+            game.putPiece(loc, PieceType.King, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(1, 1), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(8, 1), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(7, 1), PieceType.Knight, Color.WHITE); // g1 blocks kingside
+
+            Set<Location> expected = Set.of(
+                    Location.fromCoordinates(3, 1), // queenside castle
+                    Location.fromCoordinates(4, 1),
+                    Location.fromCoordinates(6, 1),
+                    Location.fromCoordinates(4, 2),
+                    Location.fromCoordinates(5, 2),
+                    Location.fromCoordinates(6, 2));
+
+            ArrayList<Move> moves = game.computeMoves(loc);
+            Set<Location> actualMoves = createActualMoves(moves);
+            assertEquals(expected, actualMoves);
+        }
+
+        @Test
+        void queensideCastleIsBlockedWhenBFileIsOccupied() {
+            Game game = new Game();
+            Location loc = Location.fromString("e1");
+            game.putPiece(loc, PieceType.King, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(1, 1), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(8, 1), PieceType.Rook, Color.WHITE);
+            game.putPiece(Location.fromCoordinates(2, 1), PieceType.Knight, Color.WHITE); // b1 blocks queenside
+
+            Set<Location> expected = Set.of(
+                    Location.fromCoordinates(4, 1),
+                    Location.fromCoordinates(6, 1),
+                    Location.fromCoordinates(7, 1), // kingside castle
+                    Location.fromCoordinates(4, 2),
+                    Location.fromCoordinates(5, 2),
+                    Location.fromCoordinates(6, 2));
+
+            ArrayList<Move> moves = game.computeMoves(loc);
+            Set<Location> actualMoves = createActualMoves(moves);
+            assertEquals(expected, actualMoves);
+        }
     }
 
     private void assertLocationHasPiece(Location location, Color color, PieceType pieceType) {
@@ -607,14 +1084,32 @@ class GameTest {
     }
 
     private void assertMoveExists(ArrayList<Move> moves, Location expectedLocation) {
-        boolean found = false;
-
         for (Move move : moves) {
             if (move.getTo().equals(expectedLocation)) {
                 return;
             }
         }
         fail("move does not exist");
+    }
+
+    private static void assertMoves(Game game, String fromSquare, String... expectedSquares) {
+        Location from = Location.fromString(fromSquare);
+        ArrayList<Move> moves = game.computeMoves(from);
+
+        assertNotNull(moves);
+
+        Set<Location> expected = new HashSet<>();
+        for (String square : expectedSquares) {
+            expected.add(Location.fromString(square));
+        }
+
+        assertEquals(expected, createActualMoves(moves), "Move destinations do not match");
+        assertEquals(expected.size(), moves.size(), "Duplicate moves found");
+
+        for (Move move : moves) {
+            assertEquals(from, move.getFrom());
+            assertSame(game.getPiece(from), move.getPiece());
+        }
     }
 
     private static Set<Location> createActualMoves(ArrayList<Move> moves) {
