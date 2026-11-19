@@ -132,7 +132,14 @@ public class Game {
                 new Location.Shift(0, 1),
                 new Location.Shift(0, -1));
 
-        for (Location.Shift shift : rookShifts) {
+        computeSlidingMoves(location, piece, rookShifts, validMoves);
+
+        return validMoves;
+    }
+
+    private void computeSlidingMoves(
+            Location location, Piece piece, List<Location.Shift> shifts, ArrayList<Move> validMoves) {
+        for (Location.Shift shift : shifts) {
             Optional<Location> currentOptional = location.shift(shift);
 
             while (currentOptional.isPresent()) {
@@ -150,8 +157,6 @@ public class Game {
                 currentOptional = destination.shift(shift);
             }
         }
-
-        return validMoves;
     }
 
     private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {
@@ -176,7 +181,16 @@ public class Game {
     }
 
     private ArrayList<Move> computeBishopMoves(Location location, Piece piece) {
-        throw new RuntimeException("not implemented yet");
+        ArrayList<Move> validMoves = new ArrayList<>();
+
+        List<Location.Shift> bishopShifts = List.of(
+                new Location.Shift(1, 1),
+                new Location.Shift(-1, -1),
+                new Location.Shift(1, -1),
+                new Location.Shift(-1, 1));
+
+        computeSlidingMoves(location, piece, bishopShifts, validMoves);
+        return validMoves;
     }
 
     private ArrayList<Move> computeQueenMoves(Location location, Piece piece) {
