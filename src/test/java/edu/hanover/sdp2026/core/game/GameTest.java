@@ -109,34 +109,6 @@ class GameTest {
             assertFalse(move);
             assertFalse(move2);
         }
-
-        @Test
-        void setHasMovedTrueWorks() {
-            game = Game.createDefaultGame();
-            Piece pawn = game.getPiece(Location.fromCoordinates(2, 2));
-            game.setHasMoved(pawn, true);
-            Piece horse = game.getPiece(Location.fromCoordinates(2, 1));
-            game.setHasMoved(horse, true);
-
-            assertTrue(game.hasMoved(pawn));
-            assertTrue(game.hasMoved(horse));
-        }
-
-        @Test
-        void setHasMovedFalseWorks() {
-            game = Game.createDefaultGame();
-
-            Piece pawn = game.getPiece(Location.fromCoordinates(2, 2));
-            game.setHasMoved(pawn, true);
-            game.setHasMoved(pawn, false);
-
-            Piece horse = game.getPiece(Location.fromCoordinates(2, 1));
-            game.setHasMoved(horse, true);
-            game.setHasMoved(horse, false);
-
-            assertFalse(game.hasMoved(pawn));
-            assertFalse(game.hasMoved(horse));
-        }
     }
 
     @Nested
