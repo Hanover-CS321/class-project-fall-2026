@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class Game {
-    private final Board board = new Board();
+    private final Board gameBoard = new Board();
     private Color turn = Color.WHITE;
 
     public Game() {}
@@ -17,6 +17,10 @@ public class Game {
     }
 
     public ArrayList<Move> computeMoves(Location location) {
+        return computeMoves(gameBoard, location);
+    }
+
+    public ArrayList<Move> computeMoves(Board board, Location location) {
         Piece piece = board.getPiece(location);
 
         if (piece == null) return null;
@@ -24,19 +28,17 @@ public class Game {
         if (!isColorTurnOf(piece)) return null;
 
         return switch (piece.getType()) {
-            case Pawn -> computePawnMoves(location, piece);
-            case Rook -> computeRookMoves(location, piece);
-            case Knight -> computeKnightMoves(location, piece);
-            case Bishop -> computeBishopMoves(location, piece);
-            case Queen -> computeQueenMoves(location, piece);
-            case King -> computeKingMoves(location, piece);
+            case Pawn -> computePawnMoves(board, location, piece);
+            case Rook -> computeRookMoves(board, location, piece);
+            case Knight -> computeKnightMoves(board, location, piece);
+            case Bishop -> computeBishopMoves(board, location, piece);
+            case Queen -> computeQueenMoves(board, location, piece);
+            case King -> computeKingMoves(board, location, piece);
             default -> throw new RuntimeException("no valid PieceType");
         };
     }
 
-    public void makeMove(Move move) {
-
-    }
+    public void makeMove(Move move) {}
 
     public Color getTurn() {
         return turn;
@@ -46,16 +48,24 @@ public class Game {
         this.turn = turn;
     }
 
+    public boolean hasMoved(Piece piece) {
+        return gameBoard.hasMoved(piece);
+    }
+
+    public void setHasMoved(Piece piece, boolean movedState) {
+        gameBoard.setHasMoved(piece, movedState);
+    }
+
     Piece getPiece(Location location) {
-        return board.getPiece(location);
+        return gameBoard.getPiece(location);
     }
 
     void putPiece(Location location, PieceType type, Color color) {
-        board.putPiece(location, type, color);
+        gameBoard.putPiece(location, type, color);
     }
 
     Board getBoard() {
-        return board;
+        return gameBoard;
     }
 
     private void setupInitialBoard() {
@@ -71,13 +81,13 @@ public class Game {
         };
 
         for (int col = 1; col <= 8; col++) {
-            board.putPiece(Location.fromCoordinates(col, 1), backRow[col - 1], Color.WHITE);
+            gameBoard.putPiece(Location.fromCoordinates(col, 1), backRow[col - 1], Color.WHITE);
 
-            board.putPiece(Location.fromCoordinates(col, 2), PieceType.Pawn, Color.WHITE);
+            gameBoard.putPiece(Location.fromCoordinates(col, 2), PieceType.Pawn, Color.WHITE);
 
-            board.putPiece(Location.fromCoordinates(col, 7), PieceType.Pawn, Color.BLACK);
+            gameBoard.putPiece(Location.fromCoordinates(col, 7), PieceType.Pawn, Color.BLACK);
 
-            board.putPiece(Location.fromCoordinates(col, 8), backRow[col - 1], Color.BLACK);
+            gameBoard.putPiece(Location.fromCoordinates(col, 8), backRow[col - 1], Color.BLACK);
         }
     }
 
@@ -85,7 +95,7 @@ public class Game {
         return piece.getColor() == turn;
     }
 
-    private ArrayList<Move> computePawnMoves(Location location, Piece piece) {
+    private ArrayList<Move> computePawnMoves(Board board, Location location, Piece piece) {
         ArrayList<Move> moves = new ArrayList<Move>();
 
         Location.Shift rowChange = new Location.Shift(0, piece.getColor() == Color.WHITE ? 1 : -1);
@@ -95,25 +105,26 @@ public class Game {
                 .getValidDestinations(
                         List.of(rowChange.add(new Location.Shift(-1, 0)), rowChange.add(new Location.Shift(1, 0))))
                 .stream()
-                .filter(l -> locationOccupiedByOpponentOf(piece, l))
+                .filter(l -> locationOccupiedByOpponentOf(board, piece, l))
                 .map(l -> new Move(piece, location, l))
                 .forEach(moves::add);
 
         // forward one space logic
-        Optional<Location> forwardSpaceCheck = location.shift(rowChange).filter(this::locationNotOccupied);
+        Optional<Location> forwardSpaceCheck =
+                location.shift(rowChange).filter(next -> locationNotOccupied(board, next));
         forwardSpaceCheck.ifPresent(l -> moves.add(new Move(piece, location, l)));
 
         // forward two spaces logic
         forwardSpaceCheck
                 .filter(next -> !board.hasMoved(piece))
                 .flatMap(next -> location.shift(rowChange.add(rowChange)))
-                .filter(this::locationNotOccupied)
+                .filter(next -> locationNotOccupied(board, next))
                 .ifPresent(next -> moves.add(new Move(piece, location, next)));
 
         return moves;
     }
 
-    private ArrayList<Move> computeRookMoves(Location location, Piece piece) {
+    private ArrayList<Move> computeRookMoves(Board board, Location location, Piece piece) {
         ArrayList<Move> validMoves = new ArrayList<>();
 
         List<Location.Shift> rookShifts = List.of(
@@ -122,13 +133,13 @@ public class Game {
                 new Location.Shift(0, 1),
                 new Location.Shift(0, -1));
 
-        computeSlidingMoves(location, piece, rookShifts, validMoves);
+        computeSlidingMoves(board, location, piece, rookShifts, validMoves);
 
         return validMoves;
     }
 
     private void computeSlidingMoves(
-            Location location, Piece piece, List<Location.Shift> shifts, ArrayList<Move> validMoves) {
+            Board board, Location location, Piece piece, List<Location.Shift> shifts, ArrayList<Move> validMoves) {
         for (Location.Shift shift : shifts) {
             Optional<Location> currentOptional = location.shift(shift);
 
@@ -149,7 +160,7 @@ public class Game {
         }
     }
 
-    private ArrayList<Move> computeKnightMoves(Location location, Piece piece) {
+    private ArrayList<Move> computeKnightMoves(Board board, Location location, Piece piece) {
         // all 8 possibilities
         ArrayList<Move> validMoves = new ArrayList<>();
         List<Location.Shift> knightShifts = List.of(
@@ -170,7 +181,7 @@ public class Game {
         return validMoves;
     }
 
-    private ArrayList<Move> computeBishopMoves(Location location, Piece piece) {
+    private ArrayList<Move> computeBishopMoves(Board board, Location location, Piece piece) {
         ArrayList<Move> validMoves = new ArrayList<>();
 
         List<Location.Shift> bishopShifts = List.of(
@@ -179,19 +190,19 @@ public class Game {
                 new Location.Shift(1, -1),
                 new Location.Shift(-1, 1));
 
-        computeSlidingMoves(location, piece, bishopShifts, validMoves);
+        computeSlidingMoves(board, location, piece, bishopShifts, validMoves);
         return validMoves;
     }
 
-    private ArrayList<Move> computeQueenMoves(Location location, Piece piece) {
+    private ArrayList<Move> computeQueenMoves(Board board, Location location, Piece piece) {
         // Queen moves is just bishop combine with rook
-        ArrayList<Move> queenMoves = computeBishopMoves(location, piece);
-        queenMoves.addAll(computeRookMoves(location, piece));
+        ArrayList<Move> queenMoves = computeBishopMoves(board, location, piece);
+        queenMoves.addAll(computeRookMoves(board, location, piece));
         return queenMoves;
         // throw new RuntimeException("not implemented yet");
     }
 
-    private ArrayList<Move> computeKingMoves(Location location, Piece piece) {
+    private ArrayList<Move> computeKingMoves(Board board, Location location, Piece piece) {
         ArrayList<Move> validMoves = new ArrayList<>();
         List<Location.Shift> allShifts = new ArrayList<>();
 
@@ -205,20 +216,20 @@ public class Game {
                 new Location.Shift(0, 1),
                 new Location.Shift(0, -1));
 
-        List<Location.Shift> castleShifts = addCastles(location, piece);
+        List<Location.Shift> castleShifts = addCastles(board, location, piece);
 
         allShifts.addAll(castleShifts);
         allShifts.addAll(kingShifts);
 
         location.getValidDestinations(allShifts).stream()
-                .filter(l -> !locationOccupiedByAllyOf(piece, l))
+                .filter(l -> !locationOccupiedByAllyOf(board, piece, l))
                 .map(l -> new Move(piece, location, l))
                 .forEach(validMoves::add);
 
         return validMoves;
     }
 
-    private List<Location.Shift> addCastles(Location location, Piece piece) {
+    private List<Location.Shift> addCastles(Board board, Location location, Piece piece) {
         if (board.hasMoved(piece)) {
             return List.of();
         }
@@ -227,49 +238,50 @@ public class Game {
 
         // confirm queen side rook and hasn't moved and path is clear
         Location qRook = Location.fromCoordinates(1, row);
-        if (isUnMovedRook(qRook)) {
-            if (pathClear(2, 3, row)) {
+        if (isUnMovedRook(board, qRook)) {
+            if (pathClear(board, 2, 3, row)) {
                 kingShifts.add(new Location.Shift(-2, 0));
             }
         }
 
         // confirm king side rook and hasn't moved and path is clear
         Location kRook = Location.fromCoordinates(8, row);
-        if (isUnMovedRook(kRook)) {
-            if (pathClear(6, 2, row)) {
+        if (isUnMovedRook(board, kRook)) {
+            if (pathClear(board, 6, 2, row)) {
                 kingShifts.add(new Location.Shift(2, 0));
             }
         }
         return kingShifts;
     }
 
-    private boolean pathClear(int xStart, int toCheck, int row) {
+    private boolean pathClear(Board board, int xStart, int toCheck, int row) {
         for (int i = 0; i < toCheck; i++) {
-            if (!locationNotOccupied(Location.fromCoordinates(xStart + i, row))) {
+            if (!locationNotOccupied(board, Location.fromCoordinates(xStart + i, row))) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean isUnMovedRook(Location rookMaybe) {
-        if (getPiece(rookMaybe) != null) {
-            return getPiece(rookMaybe).getType() == PieceType.Rook && !board.hasMoved(getPiece(rookMaybe));
+    private boolean isUnMovedRook(Board board, Location rookMaybe) {
+        Piece rookMaybePiece = board.getPiece(rookMaybe);
+        if (rookMaybePiece != null) {
+            return rookMaybePiece.getType() == PieceType.Rook && !board.hasMoved(rookMaybePiece);
         } else {
             return false;
         }
     }
 
-    private boolean locationNotOccupied(Location location) {
+    private boolean locationNotOccupied(Board board, Location location) {
         return board.getPiece(location) == null;
     }
 
-    private boolean locationOccupiedByAllyOf(Piece piece, Location location) {
+    private boolean locationOccupiedByAllyOf(Board board, Piece piece, Location location) {
         Piece otherPiece = board.getPiece(location);
         return otherPiece != null && otherPiece.getColor() == piece.getColor();
     }
 
-    private boolean locationOccupiedByOpponentOf(Piece piece, Location location) {
+    private boolean locationOccupiedByOpponentOf(Board board, Piece piece, Location location) {
         Piece otherPiece = board.getPiece(location);
         return otherPiece != null && otherPiece.getColor() != piece.getColor();
     }
